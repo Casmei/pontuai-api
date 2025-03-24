@@ -21,7 +21,7 @@ export class CreateCustomerUseCase implements Usecase<Input, Output> {
     const customer = Customer.create(input);
     try {
       const result = await this.customerRepository.create(customer);
-      this.eventDispatcher.emit('CustomerCreatedEvent', result);
+      this.eventDispatcher.emitAsync('customer.created', result);
       return Right.of(result);
     } catch (error) {
       console.log(error);

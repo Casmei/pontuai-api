@@ -5,7 +5,7 @@ import {
   CreateCustomerResponse,
 } from './contracts/create-customer';
 
-@Controller()
+@Controller('customers')
 export class CustomerController {
   constructor(private readonly createCustomerUseCase: CreateCustomerUseCase) {}
 

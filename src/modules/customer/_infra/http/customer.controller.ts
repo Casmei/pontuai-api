@@ -4,12 +4,14 @@ import {
   CreateCustomerRequest,
   CreateCustomerResponse,
 } from './contracts/create-customer';
+import { SkipAuth } from 'src/modules/auth/decorators/skip-auth.decorator';
 
 @Controller('customers')
 export class CustomerController {
-  constructor(private readonly createCustomerUseCase: CreateCustomerUseCase) {}
+  constructor(private readonly createCustomerUseCase: CreateCustomerUseCase) { }
 
   @Post()
+  @SkipAuth()
   async create(
     @Body() customerDto: CreateCustomerRequest,
   ): Promise<CreateCustomerResponse> {

@@ -16,6 +16,8 @@ async function bootstrap() {
     .setTitle('Pontuaí')
     .setDescription('The Pontuaí API experience :)')
     .setVersion('1.0')
+    .addBearerAuth()
+    .addSecurityRequirements("Bearer")
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, documentFactory);

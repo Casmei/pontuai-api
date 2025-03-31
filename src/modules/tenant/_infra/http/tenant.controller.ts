@@ -4,7 +4,7 @@ import { Body, Controller, Post } from "@nestjs/common";
 export class TenantController {
 
     @Post()
-    async create() {
+    create() {
         console.log("entrou aqui");
     }
 }

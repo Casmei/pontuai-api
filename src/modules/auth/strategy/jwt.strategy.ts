@@ -3,11 +3,11 @@ import { PassportStrategy } from '@nestjs/passport';
 import {
   Strategy as BaseStrategy,
   ExtractJwt,
-  SecretOrKeyProvider,
+  type SecretOrKeyProvider,
 } from 'passport-jwt';
 import JwksRsa from 'jwks-rsa';
-import { JwtPayload } from '../types/auth.types';
-import { JwtService } from '@nestjs/jwt';
+import type { JwtPayload } from '../types/auth.types';
+import type { JwtService } from '@nestjs/jwt';
 import { env } from 'src/config/env';
 
 @Injectable()
@@ -16,13 +16,12 @@ export class JwtStrategy extends PassportStrategy(BaseStrategy) {
     const secretOrKeyProvider: SecretOrKeyProvider = async (
       request,
       jwtToken: string,
-      done,
+      done
     ) => {
-
       try {
         const decodedToken = this.jwtService.decode(jwtToken, {
           complete: true,
-        }) as any;
+        });
 
         console.log(decodedToken);
         const jwkClient = JwksRsa({

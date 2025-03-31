@@ -50,4 +50,4 @@ const useCases: Provider[] = [
   controllers: [CustomerController],
   providers: [...otherProviders, ...repositories, ...useCases, ...events],
 })
-export class CustomerModule {}
+export class CustomerModule { }

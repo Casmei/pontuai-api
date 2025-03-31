@@ -24,6 +24,7 @@ export class JwtStrategy extends PassportStrategy(BaseStrategy) {
           complete: true,
         }) as any;
 
+        console.log(decodedToken);
         const jwkClient = JwksRsa({
           jwksUri: `${env.LOGTO_BASE_URL}/oidc/jwks`,
         });

@@ -1,4 +1,5 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { UserTenant } from './user-tenant.entity';
 
 @Entity('tenant')
 export class Tenant extends BaseEntity {
@@ -27,4 +28,7 @@ export class Tenant extends BaseEntity {
         default: true,
     })
     active: boolean;
+
+    @OneToMany(() => UserTenant, userTenant => userTenant.tenant)
+    user_tenants: UserTenant[];
 }

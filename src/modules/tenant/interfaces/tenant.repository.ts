@@ -1,10 +1,10 @@
+import { JwtPayload } from "src/modules/auth/types/auth.types";
 import { Tenant } from "../entities/tenant.entity";
+import { UserTenant } from "../entities/user-tenant.entity";
 
 export const TENANT_REPOSITORY = 'TENANT_REPOSITORY';
 
-export interface CustomerRepository {
-    create(customer: Tenant): Promise<Tenant>;
-    findById(id: string): Promise<Tenant | null>;
-    update(id: string, customer: Tenant): Promise<Tenant>;
-    delete(id: string): Promise<void>;
+export interface ITenantRepository {
+    create(tenant: Partial<Tenant>): Promise<Tenant>;
+    assignUser(user: JwtPayload, tenant: Partial<Tenant>): Promise<UserTenant>
 }

@@ -15,7 +15,7 @@ export class CreateCustomerUseCase implements Usecase<Input, Output> {
   constructor(
     private customerRepository: CustomerRepository,
     private eventDispatcher: EventDispatcher,
-  ) {}
+  ) { }
 
   async execute(input: Input): Promise<Output> {
     const customer = Customer.create(input);

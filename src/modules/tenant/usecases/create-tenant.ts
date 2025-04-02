@@ -18,7 +18,7 @@ export class CreateTenantUseCase implements Usecase<{ data: CreateTenantDto, use
             await this.tenantRepository.generateDefaultTenantConfig(tenant);
             await this.tenantRepository.assignUser(input.user, tenant);
 
-            return Right.of({ tenantId: tenant.id });
+            return Right.of(tenant);
         } catch (error) {
             return Left.of(new Error(error.message));
         }

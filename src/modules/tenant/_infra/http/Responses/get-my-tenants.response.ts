@@ -9,15 +9,15 @@ export class GetMyTenantsResponse {
 
     @ApiProperty({
         description: 'The name of the tenant',
-        example: 'Byalsoft'
+        example: 'Sorvete Amigo'
     })
     name: string;
 
     @ApiProperty({
-        description: 'The business segment of the tenant',
-        example: 'Softhouse'
+        description: 'The business slug of the tenant',
+        example: 'sorvete-amigo'
     })
-    segment: string;
+    slug: string;
 
     @ApiProperty({
         description: 'The CNPJ of the tenant',

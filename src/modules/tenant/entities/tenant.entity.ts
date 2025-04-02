@@ -1,5 +1,6 @@
-import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { UserTenant } from './user-tenant.entity';
+import { BaseEntity, Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { TenantUser } from './tenant-user.entity';
+import { TenantConfig } from './tenant-config';
 
 @Entity('tenant')
 export class Tenant extends BaseEntity {
@@ -29,6 +30,9 @@ export class Tenant extends BaseEntity {
     })
     active: boolean;
 
-    @OneToMany(() => UserTenant, userTenant => userTenant.tenant)
-    user_tenants: UserTenant[];
+    @OneToMany(() => TenantUser, tenantUser => tenantUser.tenant)
+    users: TenantUser[];
+
+    @OneToOne(() => TenantConfig, tenantConfig => tenantConfig.tenant)
+    config: TenantConfig;
 }

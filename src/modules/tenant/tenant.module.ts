@@ -5,7 +5,8 @@ import { Tenant } from "./entities/tenant.entity";
 import { ITenantRepository, TENANT_REPOSITORY } from "./interfaces/tenant.repository";
 import { TenantRepository } from "./_infra/database/tenant-typeorm.repository";
 import { CreateTenantUseCase } from "./usecases/create-tenant";
-import { UserTenant } from "./entities/user-tenant.entity";
+import { TenantUser } from "./entities/tenant-user.entity";
+import { TenantConfig } from "./entities/tenant-config";
 
 const repositories: Provider[] = [
     {
@@ -24,7 +25,7 @@ const useCases: Provider[] = [
 ];
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Tenant, UserTenant])],
+    imports: [TypeOrmModule.forFeature([Tenant, TenantUser, TenantConfig])],
     providers: [...repositories, ...useCases],
     controllers: [TenantController],
 })

@@ -6,8 +6,8 @@ export enum UserTenantRole {
     ATTENDANT = "attendant"
 }
 
-@Entity('user_tenant')
-export class UserTenant extends BaseEntity {
+@Entity('tenant_user')
+export class TenantUser extends BaseEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
@@ -16,7 +16,7 @@ export class UserTenant extends BaseEntity {
     })
     tenant_id: string;
 
-    @ManyToOne(() => Tenant, tenant => tenant.user_tenants)
+    @ManyToOne(() => Tenant, tenant => tenant.users)
     @JoinColumn({ name: 'tenant_id' })
     tenant: Tenant;
 

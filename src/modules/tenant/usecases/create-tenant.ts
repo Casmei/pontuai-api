@@ -15,9 +15,10 @@ export class CreateTenantUseCase implements Usecase<{ data: CreateTenantDto, use
     async execute(input: { data: CreateTenantDto, user: JwtPayload }): Promise<Output> {
         try {
             const tenant = await this.tenantRepository.create(input.data);
-            const userTenant = await this.tenantRepository.assignUser(input.user, tenant);
+            await this.tenantRepository.generateDefaultTenantConfig(tenant);
+            await this.tenantRepository.assignUser(input.user, tenant);
 
-            return Right.of({ tenantId: tenant.id, userTenantId: userTenant.id });
+            return Right.of({ tenantId: tenant.id });
         } catch (error) {
             console.log(error);
             return Left.of(new Error('Failed to create tenant'));

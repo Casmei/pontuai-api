@@ -16,7 +16,7 @@ export class JwtStrategy extends PassportStrategy(BaseStrategy) {
     const secretOrKeyProvider: SecretOrKeyProvider = async (
       _request,
       jwtToken: string,
-      done: (arg0: null, arg1: string | null) => void
+      done: (err: Error | null, secretOrKey?: string | Buffer) => void
     ) => {
       try {
         const decodedToken = this.jwtService.decode(jwtToken, {
@@ -32,7 +32,7 @@ export class JwtStrategy extends PassportStrategy(BaseStrategy) {
 
         done(null, pubKey);
       } catch (error) {
-        done(error, null);
+        done(error instanceof Error ? error : new Error(String(error)), undefined);
       }
     };
 

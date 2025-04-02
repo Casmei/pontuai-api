@@ -19,6 +19,11 @@ export class TenantRepository implements ITenantRepository {
         private tenantConfigRepository: Repository<TenantConfig>,
 
     ) { }
+
+    async getByUserId(user: JwtPayload): Promise<Tenant[] | null> {
+        return await this.tenantRepository.findBy({ users: { external_user_id: user.sub } });
+    }
+
     async generateDefaultTenantConfig(tenant: Partial<Tenant>): Promise<void> {
         const tenantConfig = this.tenantConfigRepository.create({
             point_config: this.getDefaultTenantConfig(),

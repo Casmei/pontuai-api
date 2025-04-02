@@ -8,4 +8,5 @@ export interface ITenantRepository {
     create(tenant: Partial<Tenant>): Promise<Tenant>;
     assignUser(user: JwtPayload, tenant: Partial<Tenant>): Promise<TenantUser>
     generateDefaultTenantConfig(tenant: Partial<Tenant>): Promise<void>
+    getByUserId(user: JwtPayload): Promise<Tenant[] | null>;
 }

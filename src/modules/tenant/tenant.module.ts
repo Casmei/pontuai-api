@@ -7,7 +7,8 @@ import { TenantRepository } from "./_infra/database/tenant-typeorm.repository";
 import { CreateTenantUseCase } from "./usecases/create-tenant";
 import { TenantUser } from "./entities/tenant-user.entity";
 import { TenantConfig } from "./entities/tenant-config";
-import { GetMyTenants } from "./usecases/get-my-tenants.usecase";
+import { GetMyTenantsUseCase } from "./usecases/get-my-tenants.usecase";
+import { UpdateTenantSettingsUseCase } from "./usecases/update-tenant-settings.usecase";
 
 const repositories: Provider[] = [
     {
@@ -24,9 +25,15 @@ const useCases: Provider[] = [
         inject: [TENANT_REPOSITORY],
     },
     {
-        provide: GetMyTenants,
+        provide: GetMyTenantsUseCase,
         useFactory: (repository: ITenantRepository) =>
-            new GetMyTenants(repository),
+            new GetMyTenantsUseCase(repository),
+        inject: [TENANT_REPOSITORY],
+    },
+    {
+        provide: UpdateTenantSettingsUseCase,
+        useFactory: (repository: ITenantRepository) =>
+            new UpdateTenantSettingsUseCase(repository),
         inject: [TENANT_REPOSITORY],
     },
 ];

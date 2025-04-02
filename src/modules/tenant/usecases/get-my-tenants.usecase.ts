@@ -6,7 +6,7 @@ import { Tenant } from '../entities/tenant.entity';
 
 type Output = Either<Tenant[] | null, Error>;
 
-export class GetMyTenants implements Usecase<{ user: JwtPayload }, Output> {
+export class GetMyTenantsUseCase implements Usecase<{ user: JwtPayload }, Output> {
     constructor(
         private tenantRepository: ITenantRepository
     ) { }

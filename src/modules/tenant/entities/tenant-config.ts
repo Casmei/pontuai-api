@@ -20,7 +20,9 @@ export class TenantConfig extends BaseEntity {
     })
     tenant_id: string;
 
-    @OneToOne(() => Tenant, tenant => tenant.config)
+    @OneToOne(() => Tenant, tenant => tenant.config, {
+        onDelete: 'CASCADE'
+    })
     @JoinColumn({ name: 'tenant_id' })
     tenant: Tenant;
 

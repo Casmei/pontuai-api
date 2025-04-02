@@ -30,9 +30,13 @@ export class Tenant extends BaseEntity {
     })
     active: boolean;
 
-    @OneToMany(() => TenantUser, tenantUser => tenantUser.tenant)
+    @OneToMany(() => TenantUser, tenantUser => tenantUser.tenant, {
+        cascade: true
+    })
     users: TenantUser[];
 
-    @OneToOne(() => TenantConfig, tenantConfig => tenantConfig.tenant)
+    @OneToOne(() => TenantConfig, tenantConfig => tenantConfig.tenant, {
+        cascade: true
+    })
     config: TenantConfig;
 }

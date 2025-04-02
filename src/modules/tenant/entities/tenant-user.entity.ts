@@ -16,7 +16,9 @@ export class TenantUser extends BaseEntity {
     })
     tenant_id: string;
 
-    @ManyToOne(() => Tenant, tenant => tenant.users)
+    @ManyToOne(() => Tenant, tenant => tenant.users, {
+        onDelete: 'CASCADE'
+    })
     @JoinColumn({ name: 'tenant_id' })
     tenant: Tenant;
 

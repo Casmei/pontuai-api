@@ -20,8 +20,7 @@ export class CreateTenantUseCase implements Usecase<{ data: CreateTenantDto, use
 
             return Right.of({ tenantId: tenant.id });
         } catch (error) {
-            console.log(error);
-            return Left.of(new Error('Failed to create tenant'));
+            return Left.of(new Error(error.message));
         }
     }
 }

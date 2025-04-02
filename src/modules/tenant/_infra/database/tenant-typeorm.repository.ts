@@ -7,6 +7,7 @@ import { JwtPayload } from 'src/modules/auth/types/auth.types';
 import { TenantUser, UserTenantRole } from '../../entities/tenant-user.entity';
 import { ITenantRepository } from '../../interfaces/tenant.repository';
 import { PointConfig, TenantConfig } from '../../entities/tenant-config';
+import slugify from 'slugify';
 
 @Injectable()
 export class TenantRepository implements ITenantRepository {
@@ -33,12 +34,16 @@ export class TenantRepository implements ITenantRepository {
         await this.tenantConfigRepository.save(tenantConfig);
     }
 
-    async create({ cnpj, name, segment }: CreateTenantDto): Promise<Tenant> {
+    async create({ cnpj, name, slug }: CreateTenantDto): Promise<Tenant> {
+        if ((await this.slugAlreadyExist(slug))) {
+            throw new Error('Slug tenant in use!');
+        }
+
         const tenant = this.tenantRepository.create({
             name,
-            segment,
             CNPJ: cnpj,
-            active: true
+            active: true,
+            slug: slugify(slug),
         });
         return this.tenantRepository.save(tenant);
     }
@@ -61,5 +66,11 @@ export class TenantRepository implements ITenantRepository {
             expirationInDays: 90,
             minimumRedemptionValue: 100
         }
+    }
+
+    private slugAlreadyExist(slug: string): Promise<boolean> {
+        return this.tenantRepository.existsBy({
+            slug
+        });
     }
 }

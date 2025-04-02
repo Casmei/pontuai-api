@@ -12,17 +12,17 @@ export class Tenant extends BaseEntity {
     })
     name: string;
 
-
-    @Column({
-        nullable: false,
-    })
-    segment: string;
-
     @Column({
         nullable: false,
         unique: true,
     })
     CNPJ: string;
+
+    @Column({
+        nullable: false,
+        unique: true,
+    })
+    slug: string;
 
     @Column({
         nullable: false,

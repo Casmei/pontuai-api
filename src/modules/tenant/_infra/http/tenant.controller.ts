@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, HttpStatus, Post } from "@nestjs/common";
 import { GetUser } from "src/modules/auth/decorators/get-user.decorator";
 import { JwtPayload } from "src/modules/auth/types/auth.types";
 import CreateTenantDto from "./Dtos/create-tenant.dto";
@@ -28,6 +28,11 @@ export class TenantController {
         if (result.isRight()) {
             return result.value;
         }
+
+        throw new HttpException({
+            status: HttpStatus.BAD_REQUEST,
+            error: result.error.message,
+        }, HttpStatus.BAD_REQUEST);
     }
 
     @Get()

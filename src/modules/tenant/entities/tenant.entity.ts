@@ -1,6 +1,7 @@
 import { BaseEntity, Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { TenantUser } from './tenant-user.entity';
 import { TenantConfig } from './tenant-config';
+import { Reward } from 'src/modules/rewards/entities/reward.entity';
 
 @Entity('tenant')
 export class Tenant extends BaseEntity {
@@ -34,6 +35,11 @@ export class Tenant extends BaseEntity {
         cascade: true
     })
     users: TenantUser[];
+
+    @OneToMany(() => Reward, reward => reward.tenant, {
+        cascade: true
+    })
+    rewards: Reward[];
 
     @OneToOne(() => TenantConfig, tenantConfig => tenantConfig.tenant, {
         cascade: true

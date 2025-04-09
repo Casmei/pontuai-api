@@ -5,6 +5,8 @@ import { RewardRepository } from "./_infra/database/reward-typeorm.repository";
 import { CreateRewardUseCase } from "./usecases/create-reward.usecase";
 import { RewardController } from "./_infra/http/reward.controller";
 import { Reward } from "./entities/reward.entity";
+import { TenantModule } from "../tenant/tenant.module";
+import { Tenant } from "../tenant/entities/tenant.entity";
 
 const repositories: Provider[] = [
     {
@@ -23,7 +25,7 @@ const useCases: Provider[] = [
 ];
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Reward])],
+    imports: [TypeOrmModule.forFeature([Reward, Tenant]), TenantModule],
     providers: [...repositories, ...useCases],
     controllers: [RewardController],
 })

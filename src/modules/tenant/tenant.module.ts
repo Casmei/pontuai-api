@@ -9,7 +9,7 @@ import { TenantUser } from "./entities/tenant-user.entity";
 import { TenantConfig } from "./entities/tenant-config";
 import { GetMyTenantsUseCase } from "./usecases/get-my-tenants.usecase";
 import { UpdateTenantSettingsUseCase } from "./usecases/update-tenant-settings.usecase";
-
+import { GetSlugPipe } from "./_infra/pipes/get-slug.pipe";
 const repositories: Provider[] = [
     {
         provide: TENANT_REPOSITORY,

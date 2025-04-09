@@ -11,7 +11,6 @@ export class CustomerController {
   constructor(private readonly createCustomerUseCase: CreateCustomerUseCase) { }
 
   @Post()
-  @SkipAuth()
   async create(
     @Body() customerDto: CreateCustomerRequest,
   ): Promise<CreateCustomerResponse> {

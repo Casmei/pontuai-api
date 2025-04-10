@@ -8,6 +8,7 @@ import { Reward } from "./entities/reward.entity";
 import { TenantModule } from "../tenant/tenant.module";
 import { Tenant } from "../tenant/entities/tenant.entity";
 import { GetAllRewardsUseCase } from "./usecases/get-all-reward.usecase";
+import { UpdateRewardUseCase } from "./usecases/update-reward.usecase";
 
 const repositories: Provider[] = [
     {
@@ -27,6 +28,12 @@ const useCases: Provider[] = [
         provide: GetAllRewardsUseCase,
         useFactory: (repository: IRewardRepository) =>
             new GetAllRewardsUseCase(repository),
+        inject: [REWARD_REPOSITORY],
+    },
+    {
+        provide: UpdateRewardUseCase,
+        useFactory: (repository: IRewardRepository) =>
+            new UpdateRewardUseCase(repository),
         inject: [REWARD_REPOSITORY],
     }
 ];

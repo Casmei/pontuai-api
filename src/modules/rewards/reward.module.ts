@@ -7,6 +7,7 @@ import { RewardController } from "./_infra/http/reward.controller";
 import { Reward } from "./entities/reward.entity";
 import { TenantModule } from "../tenant/tenant.module";
 import { Tenant } from "../tenant/entities/tenant.entity";
+import { GetAllRewardsUseCase } from "./usecases/get-all-reward.usecase";
 
 const repositories: Provider[] = [
     {
@@ -20,6 +21,12 @@ const useCases: Provider[] = [
         provide: CreateRewardUseCase,
         useFactory: (repository: IRewardRepository) =>
             new CreateRewardUseCase(repository),
+        inject: [REWARD_REPOSITORY],
+    },
+    {
+        provide: GetAllRewardsUseCase,
+        useFactory: (repository: IRewardRepository) =>
+            new GetAllRewardsUseCase(repository),
         inject: [REWARD_REPOSITORY],
     }
 ];

@@ -10,6 +10,11 @@ export class RewardRepository implements IRewardRepository {
     constructor(
         @InjectRepository(Reward) private rewardRepository: Repository<Reward>,
     ) { }
+
+    getAll(tenantId: string): Promise<Reward[]> {
+        return this.rewardRepository.findBy({ tenant_id: tenantId });
+    }
+
     create(data: CreateRewardDto, tenantId: string): Promise<Reward> {
         const reward = this.rewardRepository.create({
             name: data.name,

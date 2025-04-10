@@ -9,7 +9,8 @@ import { TenantUser } from "./entities/tenant-user.entity";
 import { TenantConfig } from "./entities/tenant-config";
 import { GetMyTenantsUseCase } from "./usecases/get-my-tenants.usecase";
 import { UpdateTenantSettingsUseCase } from "./usecases/update-tenant-settings.usecase";
-import { GetSlugPipe } from "./_infra/pipes/get-slug.pipe";
+import { APP_GUARD } from "@nestjs/core";
+import { IsValidTenantGuard } from "./guard/is-valid-tenant.guard";
 const repositories: Provider[] = [
     {
         provide: TENANT_REPOSITORY,
@@ -40,7 +41,10 @@ const useCases: Provider[] = [
 
 @Module({
     imports: [TypeOrmModule.forFeature([Tenant, TenantUser, TenantConfig])],
-    providers: [...repositories, ...useCases],
+    providers: [...repositories, ...useCases, {
+        provide: APP_GUARD,
+        useClass: IsValidTenantGuard,
+    },],
     controllers: [TenantController],
 })
 export class TenantModule { }

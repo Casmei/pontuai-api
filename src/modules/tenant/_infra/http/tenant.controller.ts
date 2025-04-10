@@ -20,6 +20,7 @@ import { GetSlugPipe } from '../pipes/get-slug.pipe';
 import { Tenant } from '../../entities/tenant.entity';
 import { UpdateTenantSettingsDto } from './Dtos/update-tenant-settings.dto';
 import { UpdateTenantSettingsUseCase } from '../../usecases/update-tenant-settings.usecase';
+import { SkipTenantCheck } from '../../decorator/skip-tenant-check';
 
 @Controller('tenant')
 export class TenantController {
@@ -38,6 +39,7 @@ export class TenantController {
     })
     @ApiResponse({ status: 400, description: 'Bad request' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @SkipTenantCheck()
     async create(@GetUser() user: JwtPayload, @Body() data: CreateTenantDto) {
         const result = await this.createTenantUseCase.execute({ data, user });
 
@@ -69,6 +71,7 @@ export class TenantController {
     })
     @ApiResponse({ status: 400, description: 'Bad request' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @SkipTenantCheck()
     async updateConfig(
         @GetUser() user: JwtPayload,
         @Body() data: UpdateTenantSettingsDto,
@@ -94,6 +97,7 @@ export class TenantController {
     })
     @ApiResponse({ status: 400, description: 'Bad request' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @SkipTenantCheck()
     async getMyTenants(@GetUser() user: JwtPayload) {
         const result = await this.getMyTenantsUseCase.execute({ user });
 

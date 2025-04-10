@@ -4,15 +4,18 @@ import {
   CreateCustomerRequest,
   CreateCustomerResponse,
 } from './contracts/create-customer';
-import { SkipAuth } from 'src/modules/auth/decorators/skip-auth.decorator';
+import { ApiHeader } from '@nestjs/swagger';
+import { GetTenantId } from 'src/modules/auth/decorators/get-tenant.decorator';
 
 @Controller('customers')
 export class CustomerController {
   constructor(private readonly createCustomerUseCase: CreateCustomerUseCase) { }
 
   @Post()
+  @ApiHeader({ name: "x-tenant-id", required: true })
   async create(
     @Body() customerDto: CreateCustomerRequest,
+    @GetTenantId() tenantId: string,
   ): Promise<CreateCustomerResponse> {
     const result = await this.createCustomerUseCase.execute(customerDto);
 

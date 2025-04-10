@@ -6,6 +6,8 @@ import { databaseConfig } from './config/database';
 import { TenantModule } from './modules/tenant/tenant.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { RewardModule } from './modules/rewards/reward.module';
+import { APP_GUARD } from '@nestjs/core';
+import { IsValidTenantGuard } from './modules/tenant/guard/is-valid-tenant.guard';
 @Module({
   imports: [
     TypeOrmModule.forRoot(databaseConfig),

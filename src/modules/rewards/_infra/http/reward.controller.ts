@@ -4,14 +4,13 @@ import {
     Param,
     Post,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateRewardUseCase } from '../../usecases/create-reward.usecase';
 import { CreateRewardDto } from './dtos/create-reward.dto';
-import { GetSlugPipe } from 'src/modules/tenant/_infra/pipes/get-slug.pipe';
-import { Tenant } from 'src/modules/tenant/entities/tenant.entity';
+import { GetTenantId } from 'src/modules/auth/decorators/get-tenant.decorator';
 
 @ApiTags('Reward')
-@Controller(':tenant_slug/reward')
+@Controller('reward')
 export class RewardController {
     constructor(
         private createRewardUseCase: CreateRewardUseCase,
@@ -24,19 +23,13 @@ export class RewardController {
         description: 'The reward has been successfully created',
         // type: CreateTenantResponse,
     })
-    @ApiParam({
-        name: 'tenant_slug',
-        type: String,
-        description: 'The unique slug identifier of the tenant',
-        example: 'my-tenant',
-        required: true,
-    })
+    @ApiHeader({ name: "x-tenant-id", required: true })
     @ApiResponse({ status: 400, description: 'Bad request' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
-    async create(@Body() data: CreateRewardDto, @Param('tenant_slug', GetSlugPipe) tenant: Tenant) {
+    async create(@Body() data: CreateRewardDto, @GetTenantId() tenantId: string) {
         const result = await this.createRewardUseCase.execute({
             data,
-            tenant
+            tenantId
         });
 
         if (result.isRight()) {

@@ -8,6 +8,7 @@ import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateRewardUseCase } from '../../usecases/create-reward.usecase';
 import { CreateRewardDto } from './dtos/create-reward.dto';
 import { GetTenantId } from 'src/modules/auth/decorators/get-tenant.decorator';
+import { CreateRewardResponse } from './responses/create-reward.response';
 
 @ApiTags('Reward')
 @Controller('reward')
@@ -21,7 +22,7 @@ export class RewardController {
     @ApiResponse({
         status: 201,
         description: 'The reward has been successfully created',
-        // type: CreateTenantResponse,
+        type: CreateRewardResponse,
     })
     @ApiHeader({ name: "x-tenant-id", required: true })
     @ApiResponse({ status: 400, description: 'Bad request' })

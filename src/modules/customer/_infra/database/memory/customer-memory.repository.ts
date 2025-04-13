@@ -1,7 +1,7 @@
 import { Customer } from 'src/modules/customer/entities/customer.entity';
-import { CustomerRepository } from 'src/modules/customer/interfaces/customer.repository';
+import { ICustomerRepository } from 'src/modules/customer/interfaces/customer.repository';
 
-export class CustomerMemoryRepository implements CustomerRepository {
+export class CustomerMemoryRepository implements ICustomerRepository {
   private customers: Customer[] = [];
 
   async create(customer: Customer): Promise<Customer> {

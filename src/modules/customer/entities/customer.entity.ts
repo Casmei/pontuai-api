@@ -1,32 +1,27 @@
-type UserProperties = {
+import { Tenant } from 'src/modules/tenant/entities/tenant.entity';
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+
+@Entity('customer')
+export class Customer extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({
+    nullable: false,
+  })
+  tenant_id: string;
+
+  @ManyToOne(() => Tenant, tenant => tenant.customers, {
+    onDelete: 'CASCADE'
+  })
+  @JoinColumn({ name: 'tenant_id' })
+  tenant: Tenant;
+
+  @Column({
+    nullable: false,
+  })
   name: string;
+
+  @Column({ nullable: true, unique: true })
   phone: string;
-};
-
-export class Customer {
-  private constructor(private props: UserProperties) {}
-
-  static create(payload: Omit<UserProperties, 'id' | 'role'>) {
-    return new Customer({
-      ...payload,
-      id: 'customer-id',
-    });
-  }
-
-  static load(payload: UserProperties) {
-    return new Customer(payload);
-  }
-
-  get id() {
-    return this.props.id;
-  }
-
-  get name() {
-    return this.props.name;
-  }
-
-  get phone() {
-    return this.props.phone;
-  }
 }

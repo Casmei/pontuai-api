@@ -9,9 +9,12 @@ import { CustomerController } from './_infra/http/customer.controller';
 import { NotifyCustomerEvent } from './events/notify-customer.event';
 import {
   CUSTOMER_REPOSITORY,
-  CustomerRepository,
+  ICustomerRepository,
 } from './interfaces/customer.repository';
 import { CreateCustomerUseCase } from './usecases/create-customer.usecase';
+import { CustomerRepository } from './_infra/database/typeorm/customer-typeorm.repository';
+import { Customer } from './entities/customer.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 const otherProviders: Provider[] = [
   {
@@ -32,21 +35,21 @@ const events: Provider[] = [
 const repositories: Provider[] = [
   {
     provide: CUSTOMER_REPOSITORY,
-    useClass: CustomerMemoryRepository,
+    useClass: CustomerRepository,
   },
 ];
 
 const useCases: Provider[] = [
   {
     provide: CreateCustomerUseCase,
-    useFactory: (repository: CustomerRepository, dispatcher: EventDispatcher) =>
+    useFactory: (repository: ICustomerRepository, dispatcher: EventDispatcher) =>
       new CreateCustomerUseCase(repository, dispatcher),
     inject: [CUSTOMER_REPOSITORY, EVENT_DISPATCHER],
   },
 ];
 
 @Module({
-  imports: [],
+  imports: [TypeOrmModule.forFeature([Customer])],
   controllers: [CustomerController],
   providers: [...otherProviders, ...repositories, ...useCases, ...events],
 })

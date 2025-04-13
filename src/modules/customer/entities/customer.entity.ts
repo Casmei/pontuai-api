@@ -1,5 +1,6 @@
 import { Tenant } from 'src/modules/tenant/entities/tenant.entity';
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Transaction } from 'src/modules/transaction/entities/transaction.entity';
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('customer')
 export class Customer extends BaseEntity {
@@ -16,6 +17,11 @@ export class Customer extends BaseEntity {
   })
   @JoinColumn({ name: 'tenant_id' })
   tenant: Tenant;
+
+  @OneToMany(() => Transaction, tenant => tenant.customer, {
+    onDelete: 'SET NULL'
+  })
+  transactions: Transaction[];
 
   @Column({
     nullable: false,

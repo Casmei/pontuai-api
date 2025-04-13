@@ -50,6 +50,7 @@ const useCases: Provider[] = [
 
 @Module({
   imports: [TypeOrmModule.forFeature([Customer])],
+  exports: [CUSTOMER_REPOSITORY],
   controllers: [CustomerController],
   providers: [...otherProviders, ...repositories, ...useCases, ...events],
 })

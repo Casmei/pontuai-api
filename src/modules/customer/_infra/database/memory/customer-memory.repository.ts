@@ -2,6 +2,9 @@ import { Customer } from 'src/modules/customer/entities/customer.entity';
 import { ICustomerRepository } from 'src/modules/customer/interfaces/customer.repository';
 
 export class CustomerMemoryRepository implements ICustomerRepository {
+  getAll(tenantId: string): Promise<Customer[]> {
+    throw new Error('Method not implemented.');
+  }
   private customers: Customer[] = [];
 
   async create(customer: Customer): Promise<Customer> {

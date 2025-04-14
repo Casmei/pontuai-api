@@ -1,13 +1,24 @@
-import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Post,
+} from '@nestjs/common';
 import { CreateCustomerUseCase } from '../../usecases/create-customer.usecase';
 import { ApiHeader, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { GetTenantId } from 'src/modules/auth/decorators/get-tenant.decorator';
 import { CreateCustomerDto } from './dtos/create-customer.dto';
 import { CreateCustomerResponse } from './responses/creste-customer.response';
+import { GetAllCustomersUseCase } from '../../usecases/get-all-customer.usecase';
+import { CustomerWithPointsResponse } from './responses/get-all-customers.response';
 
 @Controller('customers')
 export class CustomerController {
-  constructor(private readonly createCustomerUseCase: CreateCustomerUseCase) { }
+  constructor(
+    private readonly createCustomerUseCase: CreateCustomerUseCase,
+    private readonly getAllCustomersUseCase: GetAllCustomersUseCase,
+  ) { }
 
   @Post()
   @ApiOperation({ summary: 'Create a new customer' })
@@ -16,12 +27,33 @@ export class CustomerController {
     description: 'The customer has been successfully created',
     type: CreateCustomerResponse,
   })
-  @ApiHeader({ name: "x-tenant-id", required: true })
+  @ApiHeader({ name: 'x-tenant-id', required: true })
   async create(
     @Body() customerDto: CreateCustomerDto,
     @GetTenantId() tenantId: string,
   ) {
-    const result = await this.createCustomerUseCase.execute({ data: customerDto, tenantId });
+    const result = await this.createCustomerUseCase.execute({
+      data: customerDto,
+      tenantId,
+    });
+
+    if (result.isLeft()) {
+      throw new BadRequestException(result.error.message);
+    }
+
+    return result.value;
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Get customers' })
+  @ApiResponse({
+    status: 200,
+    description: 'The customer has been successfully loaded',
+    type: [CustomerWithPointsResponse]
+  })
+  @ApiHeader({ name: 'x-tenant-id', required: true })
+  async getAll(@GetTenantId() tenantId: string) {
+    const result = await this.getAllCustomersUseCase.execute({ tenantId });
 
     if (result.isLeft()) {
       throw new BadRequestException(result.error.message);

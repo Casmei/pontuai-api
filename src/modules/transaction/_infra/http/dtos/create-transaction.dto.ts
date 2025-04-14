@@ -12,12 +12,12 @@ export class CreateTransactionDto {
     type: TransactionEnum;
 
     @ApiProperty({
-        description: 'Number of points involved in the transaction',
+        description: 'Money spent in the transaction',
         example: 100,
     })
-    @IsNumber({}, { message: 'Points must be a number' })
-    @IsNotEmpty({ message: 'Points are required' })
-    points: number;
+    @IsNumber({}, { message: 'Money spent must be a number' })
+    @IsNotEmpty({ message: 'Money spent are required' })
+    moneySpent: number;
 
     @ApiProperty({
         description: 'ID of the customer related to the transaction',

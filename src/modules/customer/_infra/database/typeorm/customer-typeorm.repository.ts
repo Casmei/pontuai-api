@@ -12,11 +12,9 @@ export class CustomerRepository implements ICustomerRepository {
     ) { }
 
     async findById(id: string, tenantId: string): Promise<Customer | null> {
-        return this.customerRepository.findOne({
-            where: {
-                id,
-                tenant_id: tenantId,
-            },
+        return this.customerRepository.findOneBy({
+            id,
+            tenant_id: tenantId,
         });
     }
 

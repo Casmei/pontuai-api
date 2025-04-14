@@ -39,7 +39,7 @@ export class Transaction extends BaseEntity {
     customer: Customer;
 
     @Column({ nullable: true })
-    rewardId: string;
+    rewardId?: string;
 
     @ManyToOne(() => Reward, { nullable: true, onDelete: 'SET NULL' })
     @JoinColumn({ name: 'rewardId' })

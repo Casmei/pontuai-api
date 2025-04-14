@@ -1,4 +1,4 @@
-import { Module, Provider } from '@nestjs/common';
+import { forwardRef, Module, Provider } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   EVENT_DISPATCHER,
@@ -15,6 +15,9 @@ import { CreateCustomerUseCase } from './usecases/create-customer.usecase';
 import { CustomerRepository } from './_infra/database/typeorm/customer-typeorm.repository';
 import { Customer } from './entities/customer.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GetAllCustomersUseCase } from './usecases/get-all-customer.usecase';
+import { ITransactionRepository, TRANSACTION_REPOSITORY } from '../transaction/interfaces/transaction.repository';
+import { TransactionModule } from '../transaction/transaction.module';
 
 const otherProviders: Provider[] = [
   {
@@ -46,10 +49,16 @@ const useCases: Provider[] = [
       new CreateCustomerUseCase(repository, dispatcher),
     inject: [CUSTOMER_REPOSITORY, EVENT_DISPATCHER],
   },
+  {
+    provide: GetAllCustomersUseCase,
+    useFactory: (customerRepository: ICustomerRepository, transactionRepository: ITransactionRepository) =>
+      new GetAllCustomersUseCase(customerRepository, transactionRepository),
+    inject: [CUSTOMER_REPOSITORY, TRANSACTION_REPOSITORY],
+  },
 ];
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Customer])],
+  imports: [TypeOrmModule.forFeature([Customer]), forwardRef(() => TransactionModule)],
   exports: [CUSTOMER_REPOSITORY],
   controllers: [CustomerController],
   providers: [...otherProviders, ...repositories, ...useCases, ...events],

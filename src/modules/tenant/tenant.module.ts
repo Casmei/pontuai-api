@@ -45,6 +45,7 @@ const useCases: Provider[] = [
         provide: APP_GUARD,
         useClass: IsValidTenantGuard,
     },],
+    exports: [TENANT_REPOSITORY],
     controllers: [TenantController],
 })
 export class TenantModule { }

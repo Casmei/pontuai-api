@@ -20,6 +20,9 @@ export class TenantRepository implements ITenantRepository {
         @InjectRepository(TenantConfig)
         private tenantConfigRepository: Repository<TenantConfig>,
     ) { }
+    getTenantConfig(tenant: string): Promise<TenantConfig | null> {
+        return this.tenantConfigRepository.findOneBy({ tenant_id: tenant })
+    }
 
     async isTenantOwner(user: JwtPayload, tenant: Tenant): Promise<boolean> {
         return await this.tenantUserRepository.existsBy({

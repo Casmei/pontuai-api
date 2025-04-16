@@ -4,8 +4,7 @@ export const TRANSACTION_REPOSITORY = 'TRANSACTION_REPOSITORY';
 
 export type addPointsType = {
     customerId: string;
-    points: number;
-    type: TransactionEnum;
+    points: number,
 }
 
 export interface ITransactionRepository {

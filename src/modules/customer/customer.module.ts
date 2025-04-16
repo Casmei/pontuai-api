@@ -4,7 +4,6 @@ import {
   EVENT_DISPATCHER,
   EventDispatcher,
 } from '../common/interfaces/event-dispatcher';
-import { CustomerMemoryRepository } from './_infra/database/memory/customer-memory.repository';
 import { CustomerController } from './_infra/http/customer.controller';
 import { NotifyCustomerEvent } from './events/notify-customer.event';
 import {
@@ -16,8 +15,12 @@ import { CustomerRepository } from './_infra/database/typeorm/customer-typeorm.r
 import { Customer } from './entities/customer.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GetAllCustomersUseCase } from './usecases/get-all-customer.usecase';
-import { ITransactionRepository, TRANSACTION_REPOSITORY } from '../transaction/interfaces/transaction.repository';
+import {
+  ITransactionRepository,
+  TRANSACTION_REPOSITORY,
+} from '../transaction/interfaces/transaction.repository';
 import { TransactionModule } from '../transaction/transaction.module';
+import { AddPointsUseCase } from '../transaction/usecases/add-points.usecase';
 
 const otherProviders: Provider[] = [
   {
@@ -45,20 +48,28 @@ const repositories: Provider[] = [
 const useCases: Provider[] = [
   {
     provide: CreateCustomerUseCase,
-    useFactory: (repository: ICustomerRepository, dispatcher: EventDispatcher) =>
-      new CreateCustomerUseCase(repository, dispatcher),
-    inject: [CUSTOMER_REPOSITORY, EVENT_DISPATCHER],
+    useFactory: (
+      repository: ICustomerRepository,
+      dispatcher: EventDispatcher,
+      addPointsUseCase: AddPointsUseCase,
+    ) => new CreateCustomerUseCase(repository, dispatcher, addPointsUseCase),
+    inject: [CUSTOMER_REPOSITORY, EVENT_DISPATCHER, AddPointsUseCase],
   },
   {
     provide: GetAllCustomersUseCase,
-    useFactory: (customerRepository: ICustomerRepository, transactionRepository: ITransactionRepository) =>
-      new GetAllCustomersUseCase(customerRepository, transactionRepository),
+    useFactory: (
+      customerRepository: ICustomerRepository,
+      transactionRepository: ITransactionRepository,
+    ) => new GetAllCustomersUseCase(customerRepository, transactionRepository),
     inject: [CUSTOMER_REPOSITORY, TRANSACTION_REPOSITORY],
   },
 ];
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Customer]), forwardRef(() => TransactionModule)],
+  imports: [
+    TypeOrmModule.forFeature([Customer]),
+    forwardRef(() => TransactionModule),
+  ],
   exports: [CUSTOMER_REPOSITORY],
   controllers: [CustomerController],
   providers: [...otherProviders, ...repositories, ...useCases, ...events],

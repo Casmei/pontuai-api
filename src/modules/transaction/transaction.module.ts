@@ -47,6 +47,6 @@ const useCases: Provider[] = [
     imports: [TypeOrmModule.forFeature([Transaction]), forwardRef(() => CustomerModule), TenantModule],
     providers: [...useCases, ...repositories],
     controllers: [TransactionController],
-    exports: [TRANSACTION_REPOSITORY]
+    exports: [TRANSACTION_REPOSITORY, AddPointsUseCase]
 })
 export class TransactionModule { }

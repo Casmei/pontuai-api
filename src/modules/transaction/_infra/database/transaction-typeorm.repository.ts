@@ -5,7 +5,7 @@ import {
     addPointsType,
     ITransactionRepository,
 } from '../../interfaces/transaction.repository';
-import { Transaction } from '../../entities/transaction.entity';
+import { Transaction, TransactionEnum } from '../../entities/transaction.entity';
 
 @Injectable()
 export class TransactionRepository implements ITransactionRepository {
@@ -23,7 +23,7 @@ export class TransactionRepository implements ITransactionRepository {
         const transaction = this.transationRepository.create({
             customerId: data.customerId,
             points: data.points,
-            type: data.type,
+            type: TransactionEnum.INPUT,
         });
 
         return this.transationRepository.save(transaction);

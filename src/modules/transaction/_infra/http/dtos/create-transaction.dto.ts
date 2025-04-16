@@ -1,16 +1,7 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
-import { TransactionEnum } from 'src/modules/transaction/entities/transaction.entity';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber, IsUUID } from 'class-validator';
 
-export class CreateTransactionDto {
-    @ApiProperty({
-        description: 'Type of the transaction (input or output)',
-        example: TransactionEnum.INPUT,
-        enum: TransactionEnum,
-    })
-    @IsEnum(TransactionEnum, { message: 'Type must be input or output' })
-    type: TransactionEnum;
-
+export class AddPointsDto {
     @ApiProperty({
         description: 'Money spent in the transaction',
         example: 100,
@@ -25,12 +16,4 @@ export class CreateTransactionDto {
     })
     @IsUUID('4', { message: 'customerId must be a valid UUID' })
     customerId: string;
-
-    @ApiPropertyOptional({
-        description: 'ID of the reward associated with the transaction',
-        example: '5e887ac4-7eed-2530-91be-10cd0a2c0ef3',
-    })
-    @IsUUID('4', { message: 'rewardId must be a valid UUID' })
-    @IsOptional()
-    rewardId?: string;
 }

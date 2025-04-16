@@ -4,6 +4,7 @@ import { Usecase } from 'src/modules/common/interfaces/usecase';
 import { Customer } from '../entities/customer.entity';
 import { CreateCustomerDto } from '../_infra/http/dtos/create-customer.dto';
 import { ICustomerRepository } from '../interfaces/customer.repository';
+import { AddPointsUseCase } from 'src/modules/transaction/usecases/add-points.usecase';
 
 type Input = {
   data: CreateCustomerDto;
@@ -16,11 +17,24 @@ export class CreateCustomerUseCase implements Usecase<Input, Output> {
   constructor(
     private customerRepository: ICustomerRepository,
     private eventDispatcher: EventDispatcher,
+    private addPointsUseCase: AddPointsUseCase
   ) { }
 
-  async execute(input: Input): Promise<Output> {
+  async execute({ data, tenantId }: Input): Promise<Output> {
     try {
-      const result = await this.customerRepository.create(input.data, input.tenantId);
+      //todo: verificar se o número de telefone existe
+
+      const result = await this.customerRepository.create(data, tenantId);
+
+      if (data.moneySpent) {
+        await this.addPointsUseCase.execute({
+          data: {
+            customerId: result.id,
+            moneySpent: data.moneySpent
+          }, tenantId
+        });
+      }
+
       this.eventDispatcher.emitAsync('customer.created', result);
       return Right.of(result);
     } catch (error) {

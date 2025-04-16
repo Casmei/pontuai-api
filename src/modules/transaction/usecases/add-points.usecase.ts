@@ -1,13 +1,13 @@
 import { Either, Left, Right } from 'src/_utils/either';
 import { Usecase } from 'src/modules/common/interfaces/usecase';
 import { TransactionEnum, Transaction } from '../entities/transaction.entity';
-import { CreateTransactionDto } from '../_infra/http/dtos/create-transaction.dto';
 import { ITransactionRepository } from '../interfaces/transaction.repository';
 import { ICustomerRepository } from 'src/modules/customer/interfaces/customer.repository';
 import { ITenantRepository } from 'src/modules/tenant/interfaces/tenant.repository';
+import { AddPointsDto } from '../_infra/http/dtos/create-transaction.dto';
 
 type Input = {
-    data: CreateTransactionDto;
+    data: AddPointsDto;
     tenantId: string;
 };
 
@@ -45,9 +45,8 @@ export class AddPointsUseCase implements Usecase<Input, Output> {
             const calculatedPoints = Math.floor((data.moneySpent / moneySpent) * amount);
 
             const transaction = await this.transactionRepository.addPoints({
-                customerId: data.customerId,
-                type: TransactionEnum.INPUT,
                 points: calculatedPoints,
+                customerId: data.customerId,
             });
 
             return Right.of(transaction);

@@ -2,10 +2,9 @@ import { Either, Left, Right } from 'src/_utils/either';
 import { Usecase } from 'src/modules/common/interfaces/usecase';
 import { IRewardRepository } from '../interfaces/reward.repository';
 import { CreateRewardDto } from '../_infra/http/dtos/create-reward.dto';
-import { Reward } from '../entities/reward.entity';
 import { UpdateRewardDto } from '../_infra/http/dtos/update-reward.dto';
 
-type Output = Either<Partial<boolean>, Error>;
+type Output = Either<boolean, Error>;
 
 export class UpdateRewardUseCase implements Usecase<{ rewardId: string, data: CreateRewardDto, tenantId: string }, Output> {
     constructor(

@@ -1,12 +1,14 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateRewardUseCase } from '../../usecases/create-reward.usecase';
 import { CreateRewardDto } from './dtos/create-reward.dto';
 import { GetTenantId } from 'src/modules/auth/decorators/get-tenant.decorator';
 import { CreateRewardResponse } from './responses/create-reward.response';
 import { GetAllRewardsUseCase } from '../../usecases/get-all-reward.usecase';
-import { UpdateRewardDto } from './dtos/update-reward.dto';
+import { RedeemRewardDto } from './dtos/redeem-reward.dto';
 import { UpdateRewardUseCase } from '../../usecases/update-reward.usecase';
+import { UpdateRewardDto } from './dtos/update-reward.dto';
+import { RedeemRewardUseCase } from '../../usecases/redeem-reward.usecase';
 
 @ApiTags('Reward')
 @Controller('reward')
@@ -15,6 +17,8 @@ export class RewardController {
         private createRewardUseCase: CreateRewardUseCase,
         private getAllRewardsUseCase: GetAllRewardsUseCase,
         private updateRewardsUseCase: UpdateRewardUseCase,
+        private redeemRewardsUseCase: RedeemRewardUseCase,
+
     ) { }
 
     @Post()
@@ -79,5 +83,31 @@ export class RewardController {
         if (result.isRight()) {
             return result.value;
         }
+    }
+
+    @Patch('/:id/redeem')
+    @ApiOperation({ summary: 'Redeem a reward' })
+    @ApiResponse({
+        status: 200,
+    })
+    @ApiHeader({ name: 'x-tenant-id', required: true })
+    @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    async redeem(
+        @Body() data: RedeemRewardDto,
+        @Param('id') rewardId: string,
+        @GetTenantId() tenantId: string,
+    ) {
+        const result = await this.redeemRewardsUseCase.execute({
+            rewardId,
+            data,
+            tenantId,
+        });
+
+        if (result.isLeft()) {
+            throw new BadRequestException(result.error.message);
+        }
+
+        return result.value;
     }
 }

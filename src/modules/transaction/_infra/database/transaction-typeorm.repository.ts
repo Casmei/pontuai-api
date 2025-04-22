@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import {
     addPointsType,
     ITransactionRepository,
+    redeemReward,
 } from '../../interfaces/transaction.repository';
 import { Transaction, TransactionEnum } from '../../entities/transaction.entity';
 
@@ -13,6 +14,17 @@ export class TransactionRepository implements ITransactionRepository {
         @InjectRepository(Transaction)
         private transationRepository: Repository<Transaction>,
     ) { }
+
+    redeemReward(data: redeemReward): Promise<Transaction> {
+        const transaction = this.transationRepository.create({
+            customerId: data.customerId,
+            points: -Math.abs(data.reward.point_value),
+            rewardId: data.reward.id,
+            type: TransactionEnum.OUTPUT,
+        });
+
+        return this.transationRepository.save(transaction);
+    }
 
     async sumAllTransactions(customerId: string): Promise<number> {
         const sum = await this.transationRepository.sum("points", { customerId });

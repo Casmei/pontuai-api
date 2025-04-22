@@ -1,10 +1,16 @@
-import { Transaction, TransactionEnum } from '../entities/transaction.entity';
+import { Reward } from 'src/modules/rewards/entities/reward.entity';
+import { Transaction } from '../entities/transaction.entity';
 
 export const TRANSACTION_REPOSITORY = 'TRANSACTION_REPOSITORY';
 
 export type addPointsType = {
-    customerId: string;
+    customerId: string,
     points: number,
+}
+
+export type redeemReward = {
+    customerId: string,
+    reward: Reward,
 }
 
 export interface ITransactionRepository {
@@ -12,6 +18,9 @@ export interface ITransactionRepository {
         data: addPointsType,
     ): Promise<Transaction>;
 
-    sumAllTransactions(customerId: string): Promise<number>;
+    redeemReward(
+        data: redeemReward,
+    ): Promise<Transaction>;
 
+    sumAllTransactions(customerId: string): Promise<number>;
 }

@@ -8,4 +8,5 @@ export interface IRewardRepository {
     create(data: CreateRewardDto, tenantId: string): Promise<Reward>
     update(rewardId: string, data: UpdateRewardDto, tenantId: string): void
     getAll(tenantId: string): Promise<Reward[]>
+    getById(rewardId: string, tenantId: string): Promise<Reward | null>
 }

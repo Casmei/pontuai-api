@@ -12,6 +12,10 @@ export class RewardRepository implements IRewardRepository {
         @InjectRepository(Reward) private rewardRepository: Repository<Reward>,
     ) { }
 
+    getById(rewardId: string, tenantId: string): Promise<Reward | null> {
+        return this.rewardRepository.findOneBy({ id: rewardId, tenant_id: tenantId });
+    }
+
     getAll(tenantId: string): Promise<Reward[]> {
         return this.rewardRepository.findBy({ tenant_id: tenantId });
     }

@@ -21,20 +21,26 @@ import {
 } from '../transaction/interfaces/transaction.repository';
 import { TransactionModule } from '../transaction/transaction.module';
 import { AddPointsUseCase } from '../transaction/usecases/add-points.usecase';
+import { IWhatsAppService, WHATSAPP_SERVICE } from '../common/interfaces/whatsapp-service';
+import { EvolutionService } from '../common/services/evolution.service';
 
 const otherProviders: Provider[] = [
   {
     provide: EVENT_DISPATCHER,
     useExisting: EventEmitter2,
   },
+  {
+    provide: WHATSAPP_SERVICE,
+    useClass: EvolutionService,
+  },
 ];
 
 const events: Provider[] = [
   {
     provide: NotifyCustomerEvent,
-    useFactory: (eventDispatcher: EventDispatcher) =>
-      new NotifyCustomerEvent(eventDispatcher),
-    inject: [EVENT_DISPATCHER],
+    useFactory: (eventDispatcher: EventDispatcher, whatsAppService: IWhatsAppService) =>
+      new NotifyCustomerEvent(eventDispatcher, whatsAppService),
+    inject: [EVENT_DISPATCHER, WHATSAPP_SERVICE],
   },
 ];
 

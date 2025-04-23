@@ -24,9 +24,9 @@ export class TenantRepository implements ITenantRepository {
         return this.tenantConfigRepository.findOneBy({ tenant_id: tenant })
     }
 
-    async isTenantOwner(user: JwtPayload, tenant: Tenant): Promise<boolean> {
+    async isTenantOwner(user: JwtPayload, tenantId: string): Promise<boolean> {
         return await this.tenantUserRepository.existsBy({
-            tenant_id: tenant.id,
+            tenant_id: tenantId,
             external_user_id: user.sub,
             role: UserTenantRole.OWNER,
         });
@@ -34,10 +34,10 @@ export class TenantRepository implements ITenantRepository {
 
     async updateSettings(
         settings: UpdateTenantSettingsDto,
-        tenant: Tenant,
+        tenantId: string,
     ): Promise<void> {
         await this.tenantConfigRepository.update(
-            { tenant_id: tenant.id },
+            { tenant_id: tenantId },
             {
                 point_config: {
                     ratio: {

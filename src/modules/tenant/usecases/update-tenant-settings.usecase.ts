@@ -10,21 +10,22 @@ type Output = Either<void | null, Error>;
 export class UpdateTenantSettingsUseCase
     implements
     Usecase<
-        { data: UpdateTenantSettingsDto; tenant: Tenant; user: JwtPayload },
+        { data: UpdateTenantSettingsDto; tenantId: string; user: JwtPayload },
         Output
     > {
     constructor(private tenantRepository: ITenantRepository) { }
 
     async execute(input: {
         data: UpdateTenantSettingsDto;
-        tenant: Tenant;
+        tenantId: string;
         user: JwtPayload
     }): Promise<Output> {
         try {
-            if (!await this.tenantRepository.isTenantOwner(input.user, input.tenant)) {
+            if (!await this.tenantRepository.isTenantOwner(input.user, input.tenantId)) {
                 throw new Error('This user does not have permission to update the settings');
             }
-            await this.tenantRepository.updateSettings(input.data, input.tenant);
+
+            await this.tenantRepository.updateSettings(input.data, input.tenantId);
             return Right.of(null);
         } catch (error) {
             console.log(error);

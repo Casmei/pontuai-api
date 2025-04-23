@@ -56,16 +56,16 @@ export class TenantController {
         );
     }
 
-    @Patch(':tenant_slug/settings')
+    @Patch(':tenant_id/settings')
     @ApiOperation({ summary: 'Update tenant settings' })
     @ApiResponse({
         status: 204,
         description: "Updates the tenant's points settings",
     })
     @ApiParam({
-        name: 'tenant_slug',
+        name: 'tenant_id',
         type: String,
-        description: 'The unique slug identifier of the tenant',
+        description: 'The unique id identifier of the tenant',
         example: 'my-tenant',
         required: true,
     })
@@ -75,11 +75,11 @@ export class TenantController {
     async updateConfig(
         @GetUser() user: JwtPayload,
         @Body() data: UpdateTenantSettingsDto,
-        @Param('tenant_slug', GetSlugPipe) tenant: Tenant,
+        @Param('tenant_id') tenantId: string,
     ) {
         const result = await this.updateTenantSettingsUseCase.execute({
             data,
-            tenant,
+            tenantId,
             user
         });
 

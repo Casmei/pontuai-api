@@ -11,7 +11,7 @@ export interface ITenantRepository {
     assignUser(user: JwtPayload, tenant: Partial<Tenant>): Promise<TenantUser>
     generateDefaultTenantConfig(tenant: Partial<Tenant>): Promise<void>
     getByUserId(user: JwtPayload): Promise<Tenant[] | null>;
-    updateSettings(settings: UpdateTenantSettingsDto, tenant: Tenant): Promise<void | null>;
-    isTenantOwner(user: JwtPayload, tenant: Partial<Tenant>): Promise<boolean>
+    updateSettings(settings: UpdateTenantSettingsDto, tenantId: string): Promise<void | null>;
+    isTenantOwner(user: JwtPayload, tenantId: string): Promise<boolean>
     getTenantConfig(tenant: string): Promise<TenantConfig | null>
 }

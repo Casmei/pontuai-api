@@ -35,7 +35,7 @@ export class CreateCustomerUseCase implements Usecase<Input, Output> {
         });
       }
 
-      this.eventDispatcher.emitAsync('customer.created', result);
+      this.eventDispatcher.emitAsync('customer.created', { customer: result, tenantId });
       return Right.of(result);
     } catch (error) {
       return Left.of(new Error('Failed to create customer'));

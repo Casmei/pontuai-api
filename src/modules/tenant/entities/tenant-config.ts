@@ -10,6 +10,12 @@ export interface PointConfig {
     minimumRedemptionValue: number
 }
 
+export interface WhatsappConfig {
+    baseUrl: string,
+    apikey: string,
+    instanceName: string
+}
+
 @Entity('tenant_config')
 export class TenantConfig extends BaseEntity {
     @PrimaryGeneratedColumn('uuid')
@@ -31,4 +37,10 @@ export class TenantConfig extends BaseEntity {
         type: 'jsonb'
     })
     point_config: PointConfig;
+
+    @Column({
+        nullable: true,
+        type: 'jsonb'
+    })
+    whatsapp_config?: WhatsappConfig;
 }

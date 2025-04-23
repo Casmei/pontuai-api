@@ -23,6 +23,8 @@ import { TransactionModule } from '../transaction/transaction.module';
 import { AddPointsUseCase } from '../transaction/usecases/add-points.usecase';
 import { IWhatsAppService, WHATSAPP_SERVICE } from '../common/interfaces/whatsapp-service';
 import { EvolutionService } from '../common/services/evolution.service';
+import { ITenantRepository, TENANT_REPOSITORY } from '../tenant/interfaces/tenant.repository';
+import { TenantModule } from '../tenant/tenant.module';
 
 const otherProviders: Provider[] = [
   {
@@ -38,9 +40,12 @@ const otherProviders: Provider[] = [
 const events: Provider[] = [
   {
     provide: NotifyCustomerEvent,
-    useFactory: (eventDispatcher: EventDispatcher, whatsAppService: IWhatsAppService) =>
-      new NotifyCustomerEvent(eventDispatcher, whatsAppService),
-    inject: [EVENT_DISPATCHER, WHATSAPP_SERVICE],
+    useFactory: (
+      eventDispatcher: EventDispatcher,
+      whatsAppService: IWhatsAppService,
+      tenantRepository: ITenantRepository
+    ) => new NotifyCustomerEvent(eventDispatcher, whatsAppService, tenantRepository),
+    inject: [EVENT_DISPATCHER, WHATSAPP_SERVICE, TENANT_REPOSITORY],
   },
 ];
 
@@ -75,6 +80,7 @@ const useCases: Provider[] = [
   imports: [
     TypeOrmModule.forFeature([Customer]),
     forwardRef(() => TransactionModule),
+    TenantModule
   ],
   exports: [CUSTOMER_REPOSITORY],
   controllers: [CustomerController],

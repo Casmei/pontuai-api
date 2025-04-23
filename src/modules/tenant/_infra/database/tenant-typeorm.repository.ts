@@ -52,8 +52,13 @@ export class TenantRepository implements ITenantRepository {
     }
 
     async getByUserId(user: JwtPayload): Promise<Tenant[] | null> {
-        return await this.tenantRepository.findBy({
-            users: { external_user_id: user.sub },
+        return await this.tenantRepository.find({
+            where: {
+                users: {
+                    external_user_id: user.sub,
+                },
+            },
+            relations: ['config'],
         });
     }
 

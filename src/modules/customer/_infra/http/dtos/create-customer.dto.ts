@@ -20,5 +20,5 @@ export class CreateCustomerDto {
     })
     @IsNumber()
     @IsOptional({ message: 'Money Spent is required' })
-    moneySpent?: number | null;
+    moneySpent?: number;
 }

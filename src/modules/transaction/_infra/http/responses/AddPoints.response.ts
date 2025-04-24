@@ -22,6 +22,12 @@ export class AddPointsResponse {
     points: number;
 
     @ApiProperty({
+        description: 'Amount of value spent',
+        example: 1536,
+    })
+    value: number;
+
+    @ApiProperty({
         description: 'The customer identifier related to the point transaction',
         example: 'bb66747b-cbc0-42fe-94d1-48436b275356',
     })

@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Customer } from 'src/modules/customer/entities/customer.entity';
 import { Reward } from 'src/modules/rewards/entities/reward.entity';
+import { Tenant } from 'src/modules/tenant/entities/tenant.entity';
 
 export enum TransactionEnum {
     OUTPUT = "output",
@@ -30,6 +31,20 @@ export class Transaction extends BaseEntity {
 
     @Column({ nullable: false })
     points: number;
+
+    @Column({ nullable: true })
+    value?: number;
+
+    @Column({
+        nullable: false,
+    })
+    tenant_id: string;
+
+    @ManyToOne(() => Tenant, tenant => tenant.transactions, {
+        onDelete: 'CASCADE'
+    })
+    @JoinColumn({ name: 'tenant_id' })
+    tenant: Tenant;
 
     @Column({ nullable: true })
     customerId: string;

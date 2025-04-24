@@ -6,11 +6,14 @@ export const TRANSACTION_REPOSITORY = 'TRANSACTION_REPOSITORY';
 export type addPointsType = {
     customerId: string,
     points: number,
+    value: number,
+    tenantId: string,
 }
 
 export type redeemReward = {
     customerId: string,
     reward: Reward,
+    tenantId: string,
 }
 
 export interface ITransactionRepository {
@@ -23,4 +26,6 @@ export interface ITransactionRepository {
     ): Promise<Transaction>;
 
     sumAllTransactions(customerId: string): Promise<number>;
+
+    getAll(tenantId: string): Promise<Transaction[]>
 }

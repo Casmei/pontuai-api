@@ -18,6 +18,7 @@ import {
     TENANT_REPOSITORY,
 } from '../tenant/interfaces/tenant.repository';
 import { TenantModule } from '../tenant/tenant.module';
+import { GetInvoicesUseCase } from './usecases/get-invoices.usecase';
 
 const repositories: Provider[] = [
     {
@@ -40,6 +41,16 @@ const useCases: Provider[] = [
                 customerRepository,
             ),
         inject: [TRANSACTION_REPOSITORY, TENANT_REPOSITORY, CUSTOMER_REPOSITORY],
+    },
+    {
+        provide: GetInvoicesUseCase,
+        useFactory: (
+            transactionRepository: ITransactionRepository,
+        ) =>
+            new GetInvoicesUseCase(
+                transactionRepository,
+            ),
+        inject: [TRANSACTION_REPOSITORY],
     },
 ];
 

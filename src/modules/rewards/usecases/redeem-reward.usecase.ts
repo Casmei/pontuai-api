@@ -57,6 +57,7 @@ export class RedeemRewardUseCase
             await this.transactionRepository.redeemReward({
                 customerId: customer.id,
                 reward,
+                tenantId: input.tenantId
             });
 
             this.eventDispatcher.emitAsync('reward.redeem', { customer, reward });

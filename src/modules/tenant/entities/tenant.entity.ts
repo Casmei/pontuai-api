@@ -3,6 +3,7 @@ import { TenantUser } from './tenant-user.entity';
 import { TenantConfig } from './tenant-config';
 import { Reward } from 'src/modules/rewards/entities/reward.entity';
 import { Customer } from 'src/modules/customer/entities/customer.entity';
+import { Transaction } from 'src/modules/transaction/entities/transaction.entity';
 
 @Entity('tenant')
 export class Tenant extends BaseEntity {
@@ -41,6 +42,11 @@ export class Tenant extends BaseEntity {
         cascade: true
     })
     customers: Customer[];
+
+    @OneToMany(() => Customer, customer => customer.tenant, {
+        cascade: true
+    })
+    transactions: Transaction[];
 
     @OneToMany(() => Reward, reward => reward.tenant, {
         cascade: true

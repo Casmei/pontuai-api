@@ -1,6 +1,6 @@
 import { Either, Left, Right } from 'src/_utils/either';
 import { Usecase } from 'src/modules/common/interfaces/usecase';
-import { TransactionEnum, Transaction } from '../entities/transaction.entity';
+import { Transaction } from '../entities/transaction.entity';
 import { ITransactionRepository } from '../interfaces/transaction.repository';
 import { ICustomerRepository } from 'src/modules/customer/interfaces/customer.repository';
 import { ITenantRepository } from 'src/modules/tenant/interfaces/tenant.repository';
@@ -26,6 +26,7 @@ export class AddPointsUseCase implements Usecase<Input, Output> {
 
             const customer = await this.customerRepository.findById(data.customerId, tenantId);
 
+            const value = data.moneySpent
 
             if (!customer) {
                 throw new Error("Customer doesn't exist");
@@ -35,6 +36,8 @@ export class AddPointsUseCase implements Usecase<Input, Output> {
             if (!tenantConfig?.point_config?.ratio) {
                 throw new Error("Tenant ratio config not found");
             }
+
+            console.log(tenantConfig.point_config.ratio);
 
             const { amount, moneySpent } = tenantConfig.point_config.ratio;
 
@@ -47,7 +50,11 @@ export class AddPointsUseCase implements Usecase<Input, Output> {
             const transaction = await this.transactionRepository.addPoints({
                 points: calculatedPoints,
                 customerId: data.customerId,
+                value,
+                tenantId
             });
+
+            console.log(transaction);
 
             return Right.of(transaction);
         } catch (error) {

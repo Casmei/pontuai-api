@@ -40,13 +40,11 @@ export class TenantRepository implements ITenantRepository {
             { tenant_id: tenantId },
             {
                 point_config: {
-                    ratio: {
-                        amount: settings.ratioAmount,
-                        moneySpent: settings.ratioMoneySpent,
-                    },
+                    pointsForMoneySpent: settings.pointsForMoneySpent,
                     expirationInDays: settings.expirationInDays,
-                    minimumRedemptionValue: settings.minimumRedemptionValue,
+                    minimumValueForWinPoints: settings.minimumValueForWinPoints
                 },
+                //todo: Colocar settings do whatsapp
             },
         );
     }
@@ -99,12 +97,9 @@ export class TenantRepository implements ITenantRepository {
 
     private getDefaultTenantConfig(): PointConfig {
         return {
-            ratio: {
-                amount: 1,
-                moneySpent: 1,
-            },
+            minimumValueForWinPoints: 15,
+            pointsForMoneySpent: 1,
             expirationInDays: 90,
-            minimumRedemptionValue: 100,
         };
     }
 

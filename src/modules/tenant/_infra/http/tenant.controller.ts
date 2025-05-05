@@ -16,8 +16,6 @@ import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { CreateTenantResponse } from '../http/Responses/create-tenant.response';
 import { GetMyTenantsUseCase } from '../../usecases/get-my-tenants.usecase';
 import { GetTenant } from './Responses/get-my-tenants.response';
-import { GetSlugPipe } from '../pipes/get-slug.pipe';
-import { Tenant } from '../../entities/tenant.entity';
 import { UpdateTenantSettingsDto } from './Dtos/update-tenant-settings.dto';
 import { UpdateTenantSettingsUseCase } from '../../usecases/update-tenant-settings.usecase';
 import { SkipTenantCheck } from '../../decorator/skip-tenant-check';

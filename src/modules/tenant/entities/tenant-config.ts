@@ -2,12 +2,9 @@ import { BaseEntity, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColum
 import { Tenant } from './tenant.entity';
 
 export interface PointConfig {
-    ratio: {
-        amount: number,
-        moneySpent: number,
-    },
+    pointsForMoneySpent: number,
     expirationInDays: number,
-    minimumRedemptionValue: number
+    minimumValueForWinPoints: number,
 }
 
 export interface WhatsappConfig {

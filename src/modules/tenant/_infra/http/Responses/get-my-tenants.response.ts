@@ -1,25 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class RatioConfig {
-    @ApiProperty({
-        description: 'The number of points earned',
-        example: 1,
-    })
-    amount: number;
-
-    @ApiProperty({
-        description: 'The amount of money (in currency units) required to earn the points',
-        example: 2,
-    })
-    moneySpent: number;
-}
-
 export class PointConfig {
     @ApiProperty({
-        type: RatioConfig,
-        description: 'Configuration for how points are earned',
+        description: 'Number of points earned for a unit of money spent',
+        example: 1,
     })
-    ratio: RatioConfig;
+    pointsForMoneySpent: number;
 
     @ApiProperty({
         description: 'The number of days before points expire',
@@ -28,10 +14,10 @@ export class PointConfig {
     expirationInDays: number;
 
     @ApiProperty({
-        description: 'The minimum value required for a point redemption',
+        description: 'Minimum value for win points',
         example: 100,
     })
-    minimumRedemptionValue: number;
+    minimumValueForWinPoints: number;
 }
 
 export class WhatsappConfig {

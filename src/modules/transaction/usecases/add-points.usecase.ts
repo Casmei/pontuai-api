@@ -26,35 +26,29 @@ export class AddPointsUseCase implements Usecase<Input, Output> {
 
             const customer = await this.customerRepository.findById(data.customerId, tenantId);
 
-            const value = data.moneySpent
-
             if (!customer) {
                 throw new Error("Customer doesn't exist");
             }
 
             const tenantConfig = await this.tenantRepository.getTenantConfig(tenantId);
-            if (!tenantConfig?.point_config?.ratio) {
-                throw new Error("Tenant ratio config not found");
+
+            if (!tenantConfig) {
+                throw new Error("Invalid tenant config value");
             }
-
-            console.log(tenantConfig.point_config.ratio);
-
-            const { amount, moneySpent } = tenantConfig.point_config.ratio;
 
             if (!data.moneySpent || data.moneySpent <= 0) {
                 throw new Error("Invalid moneySpent value");
             }
 
-            const calculatedPoints = Math.floor((data.moneySpent / moneySpent) * amount);
+            const value = Math.floor(data.moneySpent)
+            const points = Math.floor(value / tenantConfig.point_config.pointsForMoneySpent)
 
             const transaction = await this.transactionRepository.addPoints({
-                points: calculatedPoints,
+                points,
                 customerId: data.customerId,
                 value,
                 tenantId
             });
-
-            console.log(transaction);
 
             return Right.of(transaction);
         } catch (error) {

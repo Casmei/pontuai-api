@@ -32,7 +32,7 @@ export class Transaction extends BaseEntity {
     @Column({ nullable: false })
     points: number;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, type: "decimal" })
     value?: number;
 
     @Column({

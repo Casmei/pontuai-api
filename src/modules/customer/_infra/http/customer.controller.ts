@@ -4,9 +4,10 @@ import {
   Controller,
   Get,
   Post,
+  Query,
 } from '@nestjs/common';
 import { CreateCustomerUseCase } from '../../usecases/create-customer.usecase';
-import { ApiHeader, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiHeader, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { GetTenantId } from 'src/modules/auth/decorators/get-tenant.decorator';
 import { CreateCustomerDto } from './dtos/create-customer.dto';
 import { CreateCustomerResponse } from './responses/creste-customer.response';
@@ -49,11 +50,15 @@ export class CustomerController {
   @ApiResponse({
     status: 200,
     description: 'The customer has been successfully loaded',
-    type: [CustomerWithPointsResponse]
+    type: [CustomerWithPointsResponse],
   })
   @ApiHeader({ name: 'x-tenant-id', required: true })
-  async getAll(@GetTenantId() tenantId: string) {
-    const result = await this.getAllCustomersUseCase.execute({ tenantId });
+  @ApiQuery({ name: 'query', required: false, description: 'Optional search query' })
+  async getAll(
+    @GetTenantId() tenantId: string,
+    @Query('query') query?: string
+  ) {
+    const result = await this.getAllCustomersUseCase.execute({ tenantId, query });
 
     if (result.isLeft()) {
       throw new BadRequestException(result.error.message);

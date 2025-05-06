@@ -25,34 +25,40 @@ export class AddPointsUseCase implements Usecase<Input, Output> {
             const { data, tenantId } = input;
 
             const customer = await this.customerRepository.findById(data.customerId, tenantId);
-
             if (!customer) {
-                throw new Error("Customer doesn't exist");
+                return Left.of(new Error("Cliente não encontrado."));
             }
 
             const tenantConfig = await this.tenantRepository.getTenantConfig(tenantId);
-
             if (!tenantConfig) {
-                throw new Error("Invalid tenant config value");
+                return Left.of(new Error("Configuração do estabelecimento não encontrada."));
             }
+
+            const { minimumValueForWinPoints, pointsForMoneySpent } = tenantConfig.point_config;
 
             if (!data.moneySpent || data.moneySpent <= 0) {
-                throw new Error("Invalid moneySpent value");
+                return Left.of(new Error("O valor gasto deve ser maior que zero."));
             }
 
-            const value = Math.floor(data.moneySpent)
-            const points = Math.floor(value / tenantConfig.point_config.pointsForMoneySpent)
+            if (data.moneySpent < minimumValueForWinPoints) {
+                return Left.of(
+                    new Error(`O valor gasto deve ser no mínimo R$ ${minimumValueForWinPoints.toFixed(2).replace('.', ',')}.`)
+                );
+            }
+
+            const value = Math.floor(data.moneySpent);
+            const points = Math.floor(value * pointsForMoneySpent);
 
             const transaction = await this.transactionRepository.addPoints({
                 points,
                 customerId: data.customerId,
                 value,
-                tenantId
+                tenantId,
             });
 
             return Right.of(transaction);
-        } catch (error) {
-            return Left.of(new Error(error.message));
+        } catch (error: any) {
+            return Left.of(new Error("Erro ao adicionar pontos: " + (error?.message || "Erro desconhecido.")));
         }
     }
 }

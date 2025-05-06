@@ -34,7 +34,8 @@ export class EvolutionService implements IWhatsAppService {
             });
 
             const data = await response.json();
-            console.log("Resposta da API:", data);
+
+            console.log("aaa: ", data)
 
             if (!response.ok) {
                 console.error(`Erro ao enviar mensagem: ${response.statusText}`);

@@ -44,7 +44,11 @@ export class TenantRepository implements ITenantRepository {
                     expirationInDays: settings.expirationInDays,
                     minimumValueForWinPoints: settings.minimumValueForWinPoints
                 },
-                //todo: Colocar settings do whatsapp
+                whatsapp_config: {
+                    apikey: settings.apikey,
+                    baseUrl: settings.baseUrl,
+                    instanceName: settings.instanceName
+                }
             },
         );
     }

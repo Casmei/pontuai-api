@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { ICustomerRepository } from 'src/modules/customer/interfaces/customer.repository';
 import { Customer } from 'src/modules/customer/entities/customer.entity';
 import { CreateCustomerDto } from '../../http/dtos/create-customer.dto';
@@ -45,8 +45,20 @@ export class CustomerRepository implements ICustomerRepository {
         await this.customerRepository.remove(customer);
     }
 
-    async getAll(tenantId: string): Promise<Customer[]> {
-        return this.customerRepository.findBy({ tenant_id: tenantId });
+
+    async getAll(tenantId: string, query?: string): Promise<Customer[]> {
+        if (!query) {
+            return this.customerRepository.find({
+                where: { tenant_id: tenantId },
+            });
+        }
+
+        return this.customerRepository.find({
+            where: [
+                { tenant_id: tenantId, name: ILike(`%${query}%`) },
+                { tenant_id: tenantId, phone: ILike(`%${query}%`) },
+            ],
+        });
     }
 
     async create(data: CreateCustomerDto, tenantId: string): Promise<Customer> {

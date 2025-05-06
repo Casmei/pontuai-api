@@ -6,6 +6,7 @@ import { ITransactionRepository } from 'src/modules/transaction/interfaces/trans
 
 type Input = {
   tenantId: string;
+  query?: string;
 };
 
 type Output = Either<{ customer: Customer, points: number }[], Error>;
@@ -18,7 +19,7 @@ export class GetAllCustomersUseCase implements Usecase<Input, Output> {
 
   async execute(input: Input): Promise<Output> {
     try {
-      const customers = await this.customerRepository.getAll(input.tenantId);
+      const customers = await this.customerRepository.getAll(input.tenantId, input?.query);
 
       const customersWithPoints = await Promise.all(
         customers.map(async customer => {

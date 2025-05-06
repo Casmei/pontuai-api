@@ -25,6 +25,7 @@ import { IWhatsAppService, WHATSAPP_SERVICE } from '../common/interfaces/whatsap
 import { EvolutionService } from '../common/services/evolution.service';
 import { ITenantRepository, TENANT_REPOSITORY } from '../tenant/interfaces/tenant.repository';
 import { TenantModule } from '../tenant/tenant.module';
+import { NotifyCustomerWithPointsEvent } from './events/notify-customer-with-points.event';
 
 const otherProviders: Provider[] = [
   {
@@ -45,6 +46,15 @@ const events: Provider[] = [
       whatsAppService: IWhatsAppService,
       tenantRepository: ITenantRepository
     ) => new NotifyCustomerEvent(eventDispatcher, whatsAppService, tenantRepository),
+    inject: [EVENT_DISPATCHER, WHATSAPP_SERVICE, TENANT_REPOSITORY],
+  },
+  {
+    provide: NotifyCustomerWithPointsEvent,
+    useFactory: (
+      eventDispatcher: EventDispatcher,
+      whatsAppService: IWhatsAppService,
+      tenantRepository: ITenantRepository
+    ) => new NotifyCustomerWithPointsEvent(eventDispatcher, whatsAppService, tenantRepository),
     inject: [EVENT_DISPATCHER, WHATSAPP_SERVICE, TENANT_REPOSITORY],
   },
 ];

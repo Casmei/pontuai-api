@@ -17,25 +17,39 @@ export class CreateCustomerUseCase implements Usecase<Input, Output> {
   constructor(
     private customerRepository: ICustomerRepository,
     private eventDispatcher: EventDispatcher,
-    private addPointsUseCase: AddPointsUseCase
+    private addPointsUseCase: AddPointsUseCase,
   ) { }
 
   async execute({ data, tenantId }: Input): Promise<Output> {
     try {
       //todo: verificar se o número de telefone existe
-
       const result = await this.customerRepository.create(data, tenantId);
 
       if (data.moneySpent) {
-        await this.addPointsUseCase.execute({
+        const transaction = await this.addPointsUseCase.execute({
           data: {
             customerId: result.id,
-            moneySpent: data.moneySpent
-          }, tenantId
+            moneySpent: data.moneySpent,
+          },
+          tenantId,
         });
+
+        if (transaction.isRight()) {
+          this.eventDispatcher.emitAsync('customer.created-with-points', {
+            customer: result,
+            tenantId,
+            transaction: transaction.value,
+          });
+        }
+
+        return Right.of(result);
       }
 
-      this.eventDispatcher.emitAsync('customer.created', { customer: result, tenantId });
+      this.eventDispatcher.emitAsync('customer.created', {
+        customer: result,
+        tenantId,
+      });
+
       return Right.of(result);
     } catch (error) {
       return Left.of(new Error('Failed to create customer'));

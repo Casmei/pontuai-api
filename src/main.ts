@@ -7,6 +7,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { env } from './config/env';
+import cors from '@fastify/cors';
+import { LoggingInterceptor } from './_utils/logger.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -26,7 +28,12 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, documentFactory);
 
-  app.enableCors({ origin: "*" })
+  app.useGlobalInterceptors(new LoggingInterceptor());
+
+  await app.register(cors, {
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  });
 
   await app.listen(env.APP_PORT ?? 3000, '0.0.0.0');
 }

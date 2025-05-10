@@ -3,22 +3,26 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Query,
 } from '@nestjs/common';
 import { CreateCustomerUseCase } from '../../usecases/create-customer.usecase';
-import { ApiHeader, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiHeader, ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { GetTenantId } from 'src/modules/auth/decorators/get-tenant.decorator';
 import { CreateCustomerDto } from './dtos/create-customer.dto';
 import { CreateCustomerResponse } from './responses/creste-customer.response';
 import { GetAllCustomersUseCase } from '../../usecases/get-all-customer.usecase';
 import { CustomerWithPointsResponse } from './responses/get-all-customers.response';
+import { GetCustomerDetailResponse } from './responses/get-customer-detail.response';
+import { GetCustomerDetailUseCase } from '../../usecases/get-customer-detail.usecase';
 
 @Controller('customers')
 export class CustomerController {
   constructor(
     private readonly createCustomerUseCase: CreateCustomerUseCase,
     private readonly getAllCustomersUseCase: GetAllCustomersUseCase,
+    private readonly getCustomerDetailUseCase: GetCustomerDetailUseCase
   ) { }
 
   @Post()
@@ -59,6 +63,32 @@ export class CustomerController {
     @Query('query') query?: string
   ) {
     const result = await this.getAllCustomersUseCase.execute({ tenantId, query });
+
+    if (result.isLeft()) {
+      throw new BadRequestException(result.error.message);
+    }
+
+    return result.value;
+  }
+
+  @Get('/:customerId')
+  @ApiOperation({ summary: 'Get unique customer' })
+  @ApiResponse({
+    status: 200,
+    description: 'The customer has been successfully loaded',
+    type: GetCustomerDetailResponse,
+  })
+  @ApiHeader({ name: 'x-tenant-id', required: true })
+  @ApiParam({
+    name: 'customerId',
+    description: 'UUID that identifies the customer',
+    example: 'bb66747b-cbc0-42fe-94d1-48436b275356',
+  })
+  async getCustomerDetail(
+    @GetTenantId() tenantId: string,
+    @Param('customerId') customerId: string,
+  ) {
+    const result = await this.getCustomerDetailUseCase.execute({ tenantId, customerId });
 
     if (result.isLeft()) {
       throw new BadRequestException(result.error.message);

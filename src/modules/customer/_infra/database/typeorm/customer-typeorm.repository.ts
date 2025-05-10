@@ -11,6 +11,10 @@ export class CustomerRepository implements ICustomerRepository {
         @InjectRepository(Customer) private customerRepository: Repository<Customer>,
     ) { }
 
+    getById(tenantId: string, customerId: string): Promise<Customer | null> {
+        return this.customerRepository.findOneBy({ id: customerId, tenant_id: tenantId });
+    }
+
     async findById(id: string, tenantId: string): Promise<Customer | null> {
         return this.customerRepository.findOneBy({
             id,

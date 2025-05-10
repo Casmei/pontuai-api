@@ -9,4 +9,5 @@ export interface ICustomerRepository {
   update(id: string, customer: Customer, tenantId: string): Promise<Customer>;
   delete(id: string, tenantId: string): Promise<void>;
   getAll(tenantId: string, query?: string): Promise<Customer[]>;
+  getById(tenantId: string, customerId: string): Promise<Customer | null>;
 }

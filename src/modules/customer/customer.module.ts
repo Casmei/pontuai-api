@@ -26,6 +26,7 @@ import { EvolutionService } from '../common/services/evolution.service';
 import { ITenantRepository, TENANT_REPOSITORY } from '../tenant/interfaces/tenant.repository';
 import { TenantModule } from '../tenant/tenant.module';
 import { NotifyCustomerWithPointsEvent } from './events/notify-customer-with-points.event';
+import { GetCustomerDetailUseCase } from './usecases/get-customer-detail.usecase';
 
 const otherProviders: Provider[] = [
   {
@@ -82,6 +83,14 @@ const useCases: Provider[] = [
       customerRepository: ICustomerRepository,
       transactionRepository: ITransactionRepository,
     ) => new GetAllCustomersUseCase(customerRepository, transactionRepository),
+    inject: [CUSTOMER_REPOSITORY, TRANSACTION_REPOSITORY],
+  },
+  {
+    provide: GetCustomerDetailUseCase,
+    useFactory: (
+      customerRepository: ICustomerRepository,
+      transactionRepository: ITransactionRepository,
+    ) => new GetCustomerDetailUseCase(customerRepository, transactionRepository),
     inject: [CUSTOMER_REPOSITORY, TRANSACTION_REPOSITORY],
   },
 ];

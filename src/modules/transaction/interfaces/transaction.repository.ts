@@ -28,4 +28,6 @@ export interface ITransactionRepository {
     sumAllTransactions(customerId: string): Promise<number>;
 
     getAll(tenantId: string): Promise<Transaction[]>
+
+    getByCustomerId(tenantId: string, customerId: string): Promise<Transaction[] | null>
 }

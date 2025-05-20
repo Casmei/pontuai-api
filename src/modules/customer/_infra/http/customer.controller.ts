@@ -16,13 +16,16 @@ import { GetAllCustomersUseCase } from '../../usecases/get-all-customer.usecase'
 import { CustomerWithPointsResponse } from './responses/get-all-customers.response';
 import { GetCustomerDetailResponse } from './responses/get-customer-detail.response';
 import { GetCustomerDetailUseCase } from '../../usecases/get-customer-detail.usecase';
+import { GetCustomerTransactionDetailUseCase } from '../../usecases/get-customer-transaction-detail.usecase';
+import { GetCustomerTransactionDetailResponse } from './responses/get-customer-transaction-detail.response';
 
 @Controller('customers')
 export class CustomerController {
   constructor(
     private readonly createCustomerUseCase: CreateCustomerUseCase,
     private readonly getAllCustomersUseCase: GetAllCustomersUseCase,
-    private readonly getCustomerDetailUseCase: GetCustomerDetailUseCase
+    private readonly getCustomerDetailUseCase: GetCustomerDetailUseCase,
+    private readonly getCustomerTransactionDetailUseCase: GetCustomerTransactionDetailUseCase
   ) { }
 
   @Post()
@@ -89,6 +92,32 @@ export class CustomerController {
     @Param('customerId') customerId: string,
   ) {
     const result = await this.getCustomerDetailUseCase.execute({ tenantId, customerId });
+
+    if (result.isLeft()) {
+      throw new BadRequestException(result.error.message);
+    }
+
+    return result.value;
+  }
+
+  @Get('/:customerId/transactions')
+  @ApiOperation({ summary: 'Get customer transaction details' })
+  @ApiResponse({
+    status: 200,
+    description: 'The transaction customer details  has been successfully loaded',
+    type: GetCustomerTransactionDetailResponse,
+  })
+  @ApiHeader({ name: 'x-tenant-id', required: true })
+  @ApiParam({
+    name: 'customerId',
+    description: 'UUID that identifies the customer',
+    example: 'bb66747b-cbc0-42fe-94d1-48436b275356',
+  })
+  async getCustomerTransactionDetail(
+    @GetTenantId() tenantId: string,
+    @Param('customerId') customerId: string,
+  ) {
+    const result = await this.getCustomerTransactionDetailUseCase.execute({ tenantId, customerId });
 
     if (result.isLeft()) {
       throw new BadRequestException(result.error.message);

@@ -27,6 +27,7 @@ import { ITenantRepository, TENANT_REPOSITORY } from '../tenant/interfaces/tenan
 import { TenantModule } from '../tenant/tenant.module';
 import { NotifyCustomerWithPointsEvent } from './events/notify-customer-with-points.event';
 import { GetCustomerDetailUseCase } from './usecases/get-customer-detail.usecase';
+import { GetCustomerTransactionDetailUseCase } from './usecases/get-customer-transaction-detail.usecase';
 
 const otherProviders: Provider[] = [
   {
@@ -92,6 +93,13 @@ const useCases: Provider[] = [
       transactionRepository: ITransactionRepository,
     ) => new GetCustomerDetailUseCase(customerRepository, transactionRepository),
     inject: [CUSTOMER_REPOSITORY, TRANSACTION_REPOSITORY],
+  },
+  {
+    provide: GetCustomerTransactionDetailUseCase,
+    useFactory: (
+      transactionRepository: ITransactionRepository,
+    ) => new GetCustomerTransactionDetailUseCase(transactionRepository),
+    inject: [TRANSACTION_REPOSITORY],
   },
 ];
 

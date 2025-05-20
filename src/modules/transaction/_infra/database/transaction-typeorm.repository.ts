@@ -18,6 +18,15 @@ export class TransactionRepository implements ITransactionRepository {
         private transationRepository: Repository<Transaction>,
     ) { }
 
+    async getByCustomerId(tenantId: string, customerId: string): Promise<Transaction[] | null> {
+        return await this.transationRepository.find({
+            where: { tenant_id: tenantId, customerId },
+            relations: ["reward"],
+            order: { createdAt: { direction: "DESC" } },
+            take: 5 //todo: dinamico
+        });
+    }
+
     async getAll(tenantId: string): Promise<Transaction[]> {
         return await this.transationRepository.find({
             where: { tenant_id: tenantId },

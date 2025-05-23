@@ -11,6 +11,7 @@ export class CustomerRepository implements ICustomerRepository {
         @InjectRepository(Customer) private customerRepository: Repository<Customer>,
     ) { }
 
+    //todo: esses dois métodos fazem a mesma coisa..
     getById(tenantId: string, customerId: string): Promise<Customer | null> {
         return this.customerRepository.findOneBy({ id: customerId, tenant_id: tenantId });
     }
@@ -18,6 +19,13 @@ export class CustomerRepository implements ICustomerRepository {
     async findById(id: string, tenantId: string): Promise<Customer | null> {
         return this.customerRepository.findOneBy({
             id,
+            tenant_id: tenantId,
+        });
+    }
+
+    async findByPhone(phone: string, tenantId: string): Promise<Customer | null> {
+        return this.customerRepository.findOneBy({
+            phone,
             tenant_id: tenantId,
         });
     }

@@ -2,7 +2,6 @@ import { Either, Left, Right } from 'src/_utils/either';
 import { Usecase } from 'src/modules/common/interfaces/usecase';
 import { ITenantRepository } from '../interfaces/tenant.repository';
 import { UpdateTenantSettingsDto } from '../_infra/http/Dtos/update-tenant-settings.dto';
-import { Tenant } from '../entities/tenant.entity';
 import { JwtPayload } from 'src/modules/auth/types/auth.types';
 
 type Output = Either<void | null, Error>;

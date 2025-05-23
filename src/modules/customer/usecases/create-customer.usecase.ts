@@ -22,7 +22,12 @@ export class CreateCustomerUseCase implements Usecase<Input, Output> {
 
   async execute({ data, tenantId }: Input): Promise<Output> {
     try {
-      //todo: verificar se o número de telefone existe
+      const customerAlreadyExist = await this.customerRepository.findByPhone(data.phone, tenantId);
+
+      if (customerAlreadyExist) {
+        return Left.of(new Error('Cliente com esse número já cadastrado no sistema!'));
+      }
+
       const result = await this.customerRepository.create(data, tenantId);
 
       if (data.moneySpent) {
@@ -40,6 +45,8 @@ export class CreateCustomerUseCase implements Usecase<Input, Output> {
             tenantId,
             transaction: transaction.value,
           });
+        } else {
+          return Left.of(transaction.error)
         }
 
         return Right.of(result);

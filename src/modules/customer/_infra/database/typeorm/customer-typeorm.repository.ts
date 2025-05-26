@@ -58,19 +58,30 @@ export class CustomerRepository implements ICustomerRepository {
     }
 
 
-    async getAll(tenantId: string, query?: string): Promise<Customer[]> {
-        if (!query) {
-            return this.customerRepository.find({
-                where: { tenant_id: tenantId },
-            });
-        }
+    async getAll(tenantId: string, query?: {
+        term?: string;
+        page?: number;
+        limit?: number;
+    }): Promise<{ data: Customer[]; total: number }> {
+        const whereClause = query?.term
+            ? [
+                { tenant_id: tenantId, name: ILike(`%${query.term}%`) },
+                { tenant_id: tenantId, phone: ILike(`%${query.term}%`) },
+            ]
+            : { tenant_id: tenantId };
 
-        return this.customerRepository.find({
-            where: [
-                { tenant_id: tenantId, name: ILike(`%${query}%`) },
-                { tenant_id: tenantId, phone: ILike(`%${query}%`) },
-            ],
+        const page = query?.page ?? 1;
+        const limit = query?.limit ?? 10;
+        const skip = (page - 1) * limit;
+
+        const [data, total] = await this.customerRepository.findAndCount({
+            where: whereClause,
+            skip,
+            take: limit,
+            order: { created_at: 'DESC' },
         });
+
+        return { data, total };
     }
 
     async create(data: CreateCustomerDto, tenantId: string): Promise<Customer> {

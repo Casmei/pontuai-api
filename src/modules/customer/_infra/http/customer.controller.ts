@@ -56,16 +56,28 @@ export class CustomerController {
   @ApiOperation({ summary: 'Get customers' })
   @ApiResponse({
     status: 200,
-    description: 'The customer has been successfully loaded',
-    type: [CustomerWithPointsResponse],
+    description: 'The customer list has been successfully loaded',
+    type: [CustomerWithPointsResponse], // idealmente, aqui deveria ser um objeto com os campos de paginação
   })
   @ApiHeader({ name: 'x-tenant-id', required: true })
   @ApiQuery({ name: 'query', required: false, description: 'Optional search query' })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number', example: 1 })
+  @ApiQuery({ name: 'limit', required: false, description: 'Items per page', example: 10 })
   async getAll(
     @GetTenantId() tenantId: string,
-    @Query('query') query?: string
+    @Query('query') query?: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
   ) {
-    const result = await this.getAllCustomersUseCase.execute({ tenantId, query });
+    const result = await this.getAllCustomersUseCase.execute({
+      tenantId,
+      query: {
+        page: Number(page),
+        limit: Number(limit),
+        term: query
+      },
+
+    });
 
     if (result.isLeft()) {
       throw new BadRequestException(result.error.message);
@@ -73,6 +85,7 @@ export class CustomerController {
 
     return result.value;
   }
+
 
   @Get('/:customerId')
   @ApiOperation({ summary: 'Get unique customer' })

@@ -13,11 +13,11 @@ import { GetTenantId } from 'src/modules/auth/decorators/get-tenant.decorator';
 import { CreateCustomerDto } from './dtos/create-customer.dto';
 import { CreateCustomerResponse } from './responses/creste-customer.response';
 import { GetAllCustomersUseCase } from '../../usecases/get-all-customer.usecase';
-import { CustomerWithPointsResponse } from './responses/get-all-customers.response';
 import { GetCustomerDetailResponse } from './responses/get-customer-detail.response';
 import { GetCustomerDetailUseCase } from '../../usecases/get-customer-detail.usecase';
 import { GetCustomerTransactionDetailUseCase } from '../../usecases/get-customer-transaction-detail.usecase';
 import { GetCustomerTransactionDetailResponse } from './responses/get-customer-transaction-detail.response';
+import { PaginatedCustomerResponse } from './responses/paginated-customer-response';
 
 @Controller('customers')
 export class CustomerController {
@@ -57,7 +57,7 @@ export class CustomerController {
   @ApiResponse({
     status: 200,
     description: 'The customer list has been successfully loaded',
-    type: [CustomerWithPointsResponse], // idealmente, aqui deveria ser um objeto com os campos de paginação
+    type: PaginatedCustomerResponse, // idealmente, aqui deveria ser um objeto com os campos de paginação
   })
   @ApiHeader({ name: 'x-tenant-id', required: true })
   @ApiQuery({ name: 'query', required: false, description: 'Optional search query' })

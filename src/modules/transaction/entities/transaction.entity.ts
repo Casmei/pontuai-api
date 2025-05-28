@@ -35,6 +35,9 @@ export class Transaction extends BaseEntity {
     @Column({ nullable: true, type: "decimal" })
     value?: number;
 
+    @Column({ nullable: true, type: "boolean" })
+    hasExpired: boolean
+
     @Column({
         nullable: false,
     })
@@ -62,6 +65,9 @@ export class Transaction extends BaseEntity {
 
     @CreateDateColumn()
     createdAt: Date;
+
+    @Column({ type: "date", nullable: true })
+    expiredAt: Date;
 
     @UpdateDateColumn()
     updatedAt: Date;

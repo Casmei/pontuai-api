@@ -34,7 +34,10 @@ export class AddPointsUseCase implements Usecase<Input, Output> {
                 return Left.of(new Error("Configuração do estabelecimento não encontrada."));
             }
 
-            const { minimumValueForWinPoints, pointsForMoneySpent } = tenantConfig.point_config;
+            const { minimumValueForWinPoints, pointsForMoneySpent, expirationInDays } = tenantConfig.point_config;
+
+            const expiredAt = new Date();
+            expiredAt.setDate(expiredAt.getDate() + expirationInDays);
 
             if (!data.moneySpent || data.moneySpent <= 0) {
                 return Left.of(new Error("O valor gasto deve ser maior que zero."));
@@ -53,6 +56,7 @@ export class AddPointsUseCase implements Usecase<Input, Output> {
                 points,
                 customerId: data.customerId,
                 value,
+                expiredAt,
                 tenantId,
             });
 

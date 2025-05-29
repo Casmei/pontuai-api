@@ -7,9 +7,11 @@ import { TenantModule } from './modules/tenant/tenant.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { RewardModule } from './modules/rewards/reward.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
+import { ScheduleModule } from '@nestjs/schedule';
 @Module({
   imports: [
     TypeOrmModule.forRoot(databaseConfig),
+    ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
     CustomerModule,
     TenantModule,

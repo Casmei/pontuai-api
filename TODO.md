@@ -1,0 +1,8 @@
+- Transactions
+    - [ ] Adicionar listagem de transações por usuário
+    - [ ] Implementar pote de pontos para expiração concreta
+    - [ ] Implementar notificação quando pontos estiverem a 7 dia de vencer
+- Stats
+    - [ ] Total de clientes ( relação com a semana passada)
+    - [ ] Transações feitas hoje ( relação com o dia anterior)
+    - [ ] Pontos atríbuidos hoje ( relação com o dia anterior)

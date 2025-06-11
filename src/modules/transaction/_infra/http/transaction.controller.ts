@@ -1,56 +1,49 @@
-import { BadRequestException, Body, Controller, Get, Post } from '@nestjs/common';
-import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { GetTenantId } from 'src/modules/auth/decorators/get-tenant.decorator';
-import { AddPointsDto } from './dtos/create-transaction.dto';
-import { AddPointsUseCase } from '../../usecases/add-points.usecase';
-import { AddPointsResponse } from './responses/AddPoints.response';
-import { GetTransactionsUseCase } from '../../usecases/get-transactions.usecase';
-import { TransactionResponse } from './responses/get-all-invoices.response';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Post,
+} from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
+import { GetTenantId } from 'src/modules/auth/decorators/get-tenant.decorator'
+import { AddPointsDto } from './dtos/create-transaction.dto'
+import { AddPointsUseCase } from '../../usecases/add-points.usecase'
+import { GetTransactionsUseCase } from '../../usecases/get-transactions.usecase'
+import {
+  DocumentCreateTransaction,
+  DocumentGetAllTransactions,
+} from '../decorators/transaction-docs.decorator'
 
 @ApiTags('Transaction')
 @Controller('transaction')
 export class TransactionController {
-    constructor(
-        private addPointUseCase: AddPointsUseCase,
-        private getTransactions: GetTransactionsUseCase,
-    ) { }
+  constructor(
+    private addPointUseCase: AddPointsUseCase,
+    private getTransactions: GetTransactionsUseCase,
+  ) {}
 
-    @Post()
-    @ApiOperation({ summary: 'Create a new transaction' })
-    @ApiResponse({
-        status: 201,
-        description: 'The reward has been successfully created',
-        type: AddPointsResponse,
-    })
-    @ApiHeader({ name: 'x-tenant-id', required: true })
-    @ApiResponse({ status: 400, description: 'Bad request' })
-    @ApiResponse({ status: 401, description: 'Unauthorized' })
-    async create(@Body() data: AddPointsDto, @GetTenantId() tenantId: string) {
-        const result = await this.addPointUseCase.execute({ data, tenantId });
+  @Post()
+  @DocumentCreateTransaction()
+  async create(@Body() data: AddPointsDto, @GetTenantId() tenantId: string) {
+    const result = await this.addPointUseCase.execute({ data, tenantId })
 
-        if (result.isLeft()) {
-            throw new BadRequestException(result.error.message);
-        }
-
-        return result.value;
+    if (result.isLeft()) {
+      throw new BadRequestException(result.error.message)
     }
 
-    @Get()
-    @ApiOperation({ summary: 'Find all invoices' })
-    @ApiResponse({
-        status: 200,
-        type: [TransactionResponse],
-    })
-    @ApiHeader({ name: 'x-tenant-id', required: true })
-    @ApiResponse({ status: 400, description: 'Bad request' })
-    @ApiResponse({ status: 401, description: 'Unauthorized' })
-    async getAll(@GetTenantId() tenantId: string) {
-        const result = await this.getTransactions.execute({ tenantId });
+    return result.value
+  }
 
-        if (result.isLeft()) {
-            throw new BadRequestException(result.error.message);
-        }
+  @Get()
+  @DocumentGetAllTransactions()
+  async getAll(@GetTenantId() tenantId: string) {
+    const result = await this.getTransactions.execute({ tenantId })
 
-        return result.value;
+    if (result.isLeft()) {
+      throw new BadRequestException(result.error.message)
     }
+
+    return result.value
+  }
 }

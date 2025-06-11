@@ -5,19 +5,21 @@ import {
   Get,
   Param,
   Post,
-  Query,
-} from '@nestjs/common';
-import { CreateCustomerUseCase } from '../../usecases/create-customer.usecase';
-import { ApiHeader, ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
-import { GetTenantId } from 'src/modules/auth/decorators/get-tenant.decorator';
-import { CreateCustomerDto } from './dtos/create-customer.dto';
-import { CreateCustomerResponse } from './responses/creste-customer.response';
-import { GetAllCustomersUseCase } from '../../usecases/get-all-customer.usecase';
-import { GetCustomerDetailResponse } from './responses/get-customer-detail.response';
-import { GetCustomerDetailUseCase } from '../../usecases/get-customer-detail.usecase';
-import { GetCustomerTransactionDetailUseCase } from '../../usecases/get-customer-transaction-detail.usecase';
-import { GetCustomerTransactionDetailResponse } from './responses/get-customer-transaction-detail.response';
-import { PaginatedCustomerResponse } from './responses/paginated-customer-response';
+} from '@nestjs/common'
+import { CreateCustomerUseCase } from '../../usecases/create-customer.usecase'
+import { GetTenantId } from 'src/modules/auth/decorators/get-tenant.decorator'
+import { CreateCustomerDto } from './dtos/create-customer.dto'
+import { GetAllCustomersUseCase } from '../../usecases/get-all-customer.usecase'
+import { GetCustomerDetailUseCase } from '../../usecases/get-customer-detail.usecase'
+import { GetCustomerTransactionDetailUseCase } from '../../usecases/get-customer-transaction-detail.usecase'
+import {
+  DocumentCreateCustomer,
+  DocumentGetCustomerDetail,
+  DocumentGetCustomers,
+  DocumentGetCustomerTransactionsDetail,
+} from '../decorators/customer-docs.decorator'
+import { DefaultPaginationQuery } from 'src/modules/@shared/decorators/default-pagination-query.decorator'
+import { PaginationQueryDto } from 'src/modules/@shared/dto/pagination-query.dto'
 
 @Controller('customers')
 export class CustomerController {
@@ -25,17 +27,11 @@ export class CustomerController {
     private readonly createCustomerUseCase: CreateCustomerUseCase,
     private readonly getAllCustomersUseCase: GetAllCustomersUseCase,
     private readonly getCustomerDetailUseCase: GetCustomerDetailUseCase,
-    private readonly getCustomerTransactionDetailUseCase: GetCustomerTransactionDetailUseCase
-  ) { }
+    private readonly getCustomerTransactionDetailUseCase: GetCustomerTransactionDetailUseCase,
+  ) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new customer' })
-  @ApiResponse({
-    status: 201,
-    description: 'The customer has been successfully created',
-    type: CreateCustomerResponse,
-  })
-  @ApiHeader({ name: 'x-tenant-id', required: true })
+  @DocumentCreateCustomer()
   async create(
     @Body() customerDto: CreateCustomerDto,
     @GetTenantId() tenantId: string,
@@ -43,99 +39,75 @@ export class CustomerController {
     const result = await this.createCustomerUseCase.execute({
       data: customerDto,
       tenantId,
-    });
+    })
 
     if (result.isLeft()) {
-      throw new BadRequestException(result.error.message);
+      throw new BadRequestException(result.error.message)
     }
 
-    return result.value;
+    return result.value
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get customers' })
-  @ApiResponse({
-    status: 200,
-    description: 'The customer list has been successfully loaded',
-    type: PaginatedCustomerResponse, // idealmente, aqui deveria ser um objeto com os campos de paginação
-  })
-  @ApiHeader({ name: 'x-tenant-id', required: true })
-  @ApiQuery({ name: 'query', required: false, description: 'Optional search query' })
-  @ApiQuery({ name: 'page', required: false, description: 'Page number', example: 1 })
-  @ApiQuery({ name: 'limit', required: false, description: 'Items per page', example: 10 })
+  @DocumentGetCustomers()
   async getAll(
     @GetTenantId() tenantId: string,
-    @Query('query') query?: string,
-    @Query('page') page = 1,
-    @Query('limit') limit = 10,
+    @DefaultPaginationQuery({ hasSearch: true }) query: PaginationQueryDto,
   ) {
     const result = await this.getAllCustomersUseCase.execute({
       tenantId,
       query: {
-        page: Number(page),
-        limit: Number(limit),
-        term: query
+        page: Number(query.page),
+        limit: Number(query.limit),
+        term: query.search,
       },
-
-    });
+    })
 
     if (result.isLeft()) {
-      throw new BadRequestException(result.error.message);
+      throw new BadRequestException(result.error.message)
     }
 
-    return result.value;
+    return result.value
   }
 
-
   @Get('/:customerId')
-  @ApiOperation({ summary: 'Get unique customer' })
-  @ApiResponse({
-    status: 200,
-    description: 'The customer has been successfully loaded',
-    type: GetCustomerDetailResponse,
-  })
-  @ApiHeader({ name: 'x-tenant-id', required: true })
-  @ApiParam({
-    name: 'customerId',
-    description: 'UUID that identifies the customer',
-    example: 'bb66747b-cbc0-42fe-94d1-48436b275356',
-  })
+  @DocumentGetCustomerDetail()
   async getCustomerDetail(
     @GetTenantId() tenantId: string,
     @Param('customerId') customerId: string,
   ) {
-    const result = await this.getCustomerDetailUseCase.execute({ tenantId, customerId });
+    const result = await this.getCustomerDetailUseCase.execute({
+      tenantId,
+      customerId,
+    })
 
     if (result.isLeft()) {
-      throw new BadRequestException(result.error.message);
+      throw new BadRequestException(result.error.message)
     }
 
-    return result.value;
+    return result.value
   }
 
   @Get('/:customerId/transactions')
-  @ApiOperation({ summary: 'Get customer transaction details' })
-  @ApiResponse({
-    status: 200,
-    description: 'The transaction customer details  has been successfully loaded',
-    type: GetCustomerTransactionDetailResponse,
-  })
-  @ApiHeader({ name: 'x-tenant-id', required: true })
-  @ApiParam({
-    name: 'customerId',
-    description: 'UUID that identifies the customer',
-    example: 'bb66747b-cbc0-42fe-94d1-48436b275356',
-  })
-  async getCustomerTransactionDetail(
+  @DocumentGetCustomerTransactionsDetail()
+  async getCustomerTransactionsDetail(
     @GetTenantId() tenantId: string,
     @Param('customerId') customerId: string,
+    @DefaultPaginationQuery({ limitDefault: 5 }) query: PaginationQueryDto,
   ) {
-    const result = await this.getCustomerTransactionDetailUseCase.execute({ tenantId, customerId });
+    const result = await this.getCustomerTransactionDetailUseCase.execute({
+      tenantId,
+      customerId,
+      query: {
+        page: Number(query.page),
+        limit: Number(query.limit),
+      },
+    })
 
     if (result.isLeft()) {
-      throw new BadRequestException(result.error.message);
+      throw new BadRequestException(result.error.message)
     }
 
-    return result.value;
+    return result.value
   }
 }

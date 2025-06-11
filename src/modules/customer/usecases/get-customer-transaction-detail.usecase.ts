@@ -1,59 +1,52 @@
-import { Either, Left, Right } from 'src/_utils/either';
-import { Usecase } from 'src/modules/common/interfaces/usecase';
-import { ICustomerRepository } from '../interfaces/customer.repository';
-import { ITransactionRepository } from 'src/modules/transaction/interfaces/transaction.repository';
-import { GetCustomerDetailResponse } from '../_infra/http/responses/get-customer-detail.response';
-import { Transaction } from 'src/modules/transaction/entities/transaction.entity';
+import { Either, Left, Right } from 'src/_utils/either'
+import { Usecase } from 'src/modules/@shared/interfaces/usecase'
+import { ITransactionRepository } from 'src/modules/transaction/interfaces/transaction.repository'
+import { GetCustomerTransactionDetailResponse } from '../_infra/http/responses/get-customer-transaction-detail.response'
+import { PaginationQueryDto } from 'src/modules/@shared/dto/pagination-query.dto'
 
 type Input = {
-  tenantId: string;
-  customerId: string;
-};
+  tenantId: string
+  customerId: string
+  query: PaginationQueryDto
+}
 
-type Output = Either<{
-  transactions: Transaction[],
-  earnedPoints: number,
-  redeemedPoints: number,
-  expiredPoints: number,
-  avaliablePoints: number
-}, Error>;
+type Output = Either<GetCustomerTransactionDetailResponse, Error>
 
-export class GetCustomerTransactionDetailUseCase implements Usecase<Input, Output> {
-  constructor(
-    private transactionRepository: ITransactionRepository,
-  ) { }
+export class GetCustomerTransactionDetailUseCase
+  implements Usecase<Input, Output>
+{
+  constructor(private transactionRepository: ITransactionRepository) {}
 
-  async execute(input: Input): Promise<Output> {
+  async execute(data: Input): Promise<Output> {
     try {
-      const transactions = await this.transactionRepository.getByCustomerId(
-        input.tenantId,
-        input.customerId,
-      );
+      const { transactions, total } =
+        await this.transactionRepository.getByCustomerId(data)
 
-      if (!transactions) return Left.of(new Error('Failed to find transactions of this user'));
+      let earnedPoints = 0,
+        redeemedPoints = 0,
+        avaliablePoints = 0
 
-      const earnedPoints = transactions
-        .filter(tx => tx.type === 'input')
-        .reduce((sum, tx) => sum + tx.points, 0);
+      if (transactions) {
+        earnedPoints = transactions
+          .filter((tx) => tx.type === 'input')
+          .reduce((sum, tx) => sum + tx.points, 0)
 
-      const redeemedPoints = transactions
-        .filter(tx => tx.type === 'output')
-        .reduce((sum, tx) => sum + tx.points, 0);
+        redeemedPoints = transactions
+          .filter((tx) => tx.type === 'output')
+          .reduce((sum, tx) => sum + tx.points, 0)
 
-      const expiredPoints = 0;
-
-      const avaliablePoints = earnedPoints - redeemedPoints - expiredPoints;
+        avaliablePoints = earnedPoints - redeemedPoints
+      }
 
       return Right.of({
         transactions,
         earnedPoints,
         redeemedPoints,
-        expiredPoints,
         avaliablePoints,
-      });
-
-    } catch (error) {
-      return Left.of(new Error('Failed to create customer'));
+        total,
+      })
+    } catch (_) {
+      return Left.of(new Error('Failed to create customer'))
     }
   }
 }

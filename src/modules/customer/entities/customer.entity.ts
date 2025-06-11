@@ -1,5 +1,5 @@
-import { Tenant } from 'src/modules/tenant/entities/tenant.entity';
-import { Transaction } from 'src/modules/transaction/entities/transaction.entity';
+import { Tenant } from 'src/modules/tenant/entities/tenant.entity'
+import { Transaction } from 'src/modules/transaction/entities/transaction.entity'
 import {
   BaseEntity,
   Column,
@@ -10,36 +10,44 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-} from 'typeorm';
+} from 'typeorm'
 
 @Entity('customer')
 export class Customer extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: string
 
   @Column({ nullable: false })
-  tenant_id: string;
+  tenant_id: string
 
-  @ManyToOne(() => Tenant, tenant => tenant.customers, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(
+    () => Tenant,
+    (tenant) => tenant.customers,
+    {
+      onDelete: 'CASCADE',
+    },
+  )
   @JoinColumn({ name: 'tenant_id' })
-  tenant: Tenant;
+  tenant: Tenant
 
-  @OneToMany(() => Transaction, transaction => transaction.customer, {
-    onDelete: 'SET NULL',
-  })
-  transactions: Transaction[];
+  @OneToMany(
+    () => Transaction,
+    (transaction) => transaction.customer,
+    {
+      onDelete: 'SET NULL',
+    },
+  )
+  transactions: Transaction[]
 
   @Column({ nullable: false })
-  name: string;
+  name: string
 
   @Column({ nullable: true, unique: true })
-  phone: string;
+  phone: string
 
   @CreateDateColumn({ name: 'created_at' })
-  created_at: Date;
+  created_at: Date
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updated_at: Date;
+  updated_at: Date
 }

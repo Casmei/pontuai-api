@@ -9,7 +9,7 @@ type Input = {
 
 type Output = Either<Transaction[], Error>;
 
-export class GetInvoicesUseCase implements Usecase<Input, Output> {
+export class GetTransactionsUseCase implements Usecase<Input, Output> {
     constructor(
         private transactionRepository: ITransactionRepository,
     ) { }

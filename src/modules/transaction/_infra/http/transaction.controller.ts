@@ -4,7 +4,7 @@ import { GetTenantId } from 'src/modules/auth/decorators/get-tenant.decorator';
 import { AddPointsDto } from './dtos/create-transaction.dto';
 import { AddPointsUseCase } from '../../usecases/add-points.usecase';
 import { AddPointsResponse } from './responses/AddPoints.response';
-import { GetInvoicesUseCase } from '../../usecases/get-invoices.usecase';
+import { GetTransactionsUseCase } from '../../usecases/get-transactions.usecase';
 import { TransactionResponse } from './responses/get-all-invoices.response';
 
 @ApiTags('Transaction')
@@ -12,7 +12,7 @@ import { TransactionResponse } from './responses/get-all-invoices.response';
 export class TransactionController {
     constructor(
         private addPointUseCase: AddPointsUseCase,
-        private getInvoices: GetInvoicesUseCase,
+        private getTransactions: GetTransactionsUseCase,
     ) { }
 
     @Post()
@@ -45,7 +45,7 @@ export class TransactionController {
     @ApiResponse({ status: 400, description: 'Bad request' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     async getAll(@GetTenantId() tenantId: string) {
-        const result = await this.getInvoices.execute({ tenantId });
+        const result = await this.getTransactions.execute({ tenantId });
 
         if (result.isLeft()) {
             throw new BadRequestException(result.error.message);

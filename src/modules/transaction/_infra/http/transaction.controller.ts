@@ -19,7 +19,6 @@ import {
 } from '../decorators/transaction-docs.decorator';
 import { RedeemRewardDto } from './dtos/redeem-reward.dto';
 import { RedeemRewardUseCase } from '../../usecases/redeem-reward.usecase';
-import { Migrate } from '../../usecases/migrate';
 import { SkipAuth } from 'src/modules/auth/decorators/skip-auth.decorator';
 
 @ApiTags('Transaction')
@@ -29,7 +28,6 @@ export class TransactionController {
     private addPointUseCase: AddPointsUseCase,
     private getTransactions: GetTransactionsUseCase,
     private redeemRewardUseCase: RedeemRewardUseCase,
-    private migrateUseCase: Migrate,
   ) {}
 
   @Post()
@@ -54,13 +52,6 @@ export class TransactionController {
     }
 
     return result.value;
-  }
-
-  @Get('yeah-bitch')
-  @DocumentGetAllTransactions()
-  @SkipAuth()
-  async migrate() {
-    await this.migrateUseCase.migrate();
   }
 
   @Patch('/:id/redeem')

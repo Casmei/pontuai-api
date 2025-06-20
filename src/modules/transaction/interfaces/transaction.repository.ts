@@ -8,7 +8,6 @@ export type addPointsType = {
   customerId: string;
   points: number;
   value: number;
-  expiredAt: Date;
   tenantId: string;
 };
 

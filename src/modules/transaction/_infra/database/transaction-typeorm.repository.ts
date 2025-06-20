@@ -67,7 +67,6 @@ export class TransactionRepository implements ITransactionRepository {
       type: TransactionEnum.INPUT,
       tenant_id: data.tenantId,
       value: data.value,
-      expiredAt: data.expiredAt,
     });
 
     return this.transactionRepository.save(transaction);

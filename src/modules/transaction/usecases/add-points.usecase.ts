@@ -70,7 +70,6 @@ export class AddPointsUseCase implements Usecase<Input, Output> {
         points,
         customerId: data.customerId,
         value,
-        expiredAt,
         tenantId,
       });
 
@@ -79,7 +78,6 @@ export class AddPointsUseCase implements Usecase<Input, Output> {
         tenantId,
         originalPoints: points,
         usedPoints: 0,
-        expiredAt,
       });
 
       return Right.of(transaction);

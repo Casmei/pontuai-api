@@ -36,7 +36,6 @@ import { EntryBalanceRepository } from './_infra/database/balance-entry-typeorm.
 import { RewardModule } from '../rewards/reward.module';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EntryBalance } from './entities/entry-balance.entity';
-import { Migrate } from './usecases/migrate';
 
 const otherProviders: Provider[] = [
   {
@@ -107,14 +106,6 @@ const useCases: Provider[] = [
       EVENT_DISPATCHER,
       ENRTY_BALANCE_REPOSITORY,
     ],
-  },
-  {
-    provide: Migrate,
-    useFactory: (
-      transactionRepository: ITransactionRepository,
-      entryBalanceRepository: IEntryBalanceRepository,
-    ) => new Migrate(transactionRepository, entryBalanceRepository),
-    inject: [TRANSACTION_REPOSITORY, ENRTY_BALANCE_REPOSITORY],
   },
 ];
 

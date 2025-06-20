@@ -63,8 +63,8 @@ export class Transaction extends BaseEntity {
   @CreateDateColumn()
   createdAt: Date;
 
-  @Column({ type: 'date', nullable: true })
-  expiredAt: Date;
+  @Column()
+  expiredAt?: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;

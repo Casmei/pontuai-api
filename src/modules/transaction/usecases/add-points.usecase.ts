@@ -78,6 +78,7 @@ export class AddPointsUseCase implements Usecase<Input, Output> {
         tenantId,
         originalPoints: points,
         usedPoints: 0,
+        expiredAt,
       });
 
       return Right.of(transaction);

@@ -1,17 +1,17 @@
-import { Either, Left, Right } from 'src/_utils/either'
-import { EventDispatcher } from 'src/modules/@shared/interfaces/event-dispatcher'
-import { Usecase } from 'src/modules/@shared/interfaces/usecase'
-import { Customer } from '../entities/customer.entity'
-import { CreateCustomerDto } from '../_infra/http/dtos/create-customer.dto'
-import { ICustomerRepository } from '../interfaces/customer.repository'
-import { AddPointsUseCase } from 'src/modules/transaction/usecases/add-points.usecase'
+import { Either, Left, Right } from 'src/_utils/either';
+import { EventDispatcher } from 'src/modules/@shared/interfaces/event-dispatcher';
+import { Usecase } from 'src/modules/@shared/interfaces/usecase';
+import { Customer } from '../entities/customer.entity';
+import { CreateCustomerDto } from '../_infra/http/dtos/create-customer.dto';
+import { ICustomerRepository } from '../interfaces/customer.repository';
+import { AddPointsUseCase } from 'src/modules/transaction/usecases/add-points.usecase';
 
 type Input = {
-  data: CreateCustomerDto
-  tenantId: string
-}
+  data: CreateCustomerDto;
+  tenantId: string;
+};
 
-type Output = Either<Customer, Error>
+type Output = Either<Customer, Error>;
 
 export class CreateCustomerUseCase implements Usecase<Input, Output> {
   constructor(
@@ -25,15 +25,15 @@ export class CreateCustomerUseCase implements Usecase<Input, Output> {
       const customerAlreadyExist = await this.customerRepository.findByPhone(
         data.phone,
         tenantId,
-      )
+      );
 
       if (customerAlreadyExist) {
         return Left.of(
           new Error('Cliente com esse número já cadastrado no sistema!'),
-        )
+        );
       }
 
-      const result = await this.customerRepository.create(data, tenantId)
+      const result = await this.customerRepository.create(data, tenantId);
 
       if (data.moneySpent) {
         const transaction = await this.addPointsUseCase.execute({
@@ -42,29 +42,29 @@ export class CreateCustomerUseCase implements Usecase<Input, Output> {
             moneySpent: data.moneySpent,
           },
           tenantId,
-        })
+        });
 
         if (transaction.isRight()) {
-          this.eventDispatcher.emitAsync('customer.created-with-points', {
+          await this.eventDispatcher.emitAsync('customer.created-with-points', {
             customer: result,
             tenantId,
             transaction: transaction.value,
-          })
+          });
         } else {
-          return Left.of(transaction.error)
+          return Left.of(transaction.error);
         }
 
-        return Right.of(result)
+        return Right.of(result);
       }
 
-      this.eventDispatcher.emitAsync('customer.created', {
+      await this.eventDispatcher.emitAsync('customer.created', {
         customer: result,
         tenantId,
-      })
+      });
 
-      return Right.of(result)
+      return Right.of(result);
     } catch (error) {
-      return Left.of(new Error('Failed to create customer'))
+      return Left.of(new Error('Failed to create customer'));
     }
   }
 }

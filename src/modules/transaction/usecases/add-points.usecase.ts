@@ -1,11 +1,11 @@
-import { Either, Left, Right } from 'src/_utils/either';
-import { Usecase } from 'src/modules/@shared/interfaces/usecase';
-import { Transaction } from '../entities/transaction.entity';
-import { ITransactionRepository } from '../interfaces/transaction.repository';
-import { ICustomerRepository } from 'src/modules/customer/interfaces/customer.repository';
-import { ITenantRepository } from 'src/modules/tenant/interfaces/tenant.repository';
-import { AddPointsDto } from '../_infra/http/dtos/create-transaction.dto';
-import { IEntryBalanceRepository } from '../interfaces/balance-entry.repository';
+import { type Either, Left, Right } from 'src/_utils/either';
+import type { Usecase } from 'src/modules/@shared/interfaces/usecase';
+import type { Transaction } from '../entities/transaction.entity';
+import type { ITransactionRepository } from '../interfaces/transaction.repository';
+import type { ICustomerRepository } from 'src/modules/customer/interfaces/customer.repository';
+import type { ITenantRepository } from 'src/modules/tenant/interfaces/tenant.repository';
+import type { AddPointsDto } from '../_infra/http/dtos/create-transaction.dto';
+import type { IEntryBalanceRepository } from '../interfaces/balance-entry.repository';
 
 type Input = {
   data: AddPointsDto;

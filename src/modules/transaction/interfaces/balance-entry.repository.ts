@@ -8,4 +8,5 @@ export interface IEntryBalanceRepository {
   customerBalance(customerId: string): Promise<number>;
   save(entry: EntryBalance): Promise<void>;
   getByCustomerId(customerId: string): Promise<EntryBalance[]>;
+  getExpiringPointsWithinDays(daysUntilExpiry: number): Promise<EntryBalance[]>;
 }

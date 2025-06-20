@@ -16,6 +16,25 @@ export class EntryBalanceRepository implements IEntryBalanceRepository {
     return await this.entryBalanceRepository.findBy({ customerId });
   }
 
+  async getExpiringPointsWithinDays(
+    daysUntilExpiry: number,
+  ): Promise<EntryBalance[]> {
+    const targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() + daysUntilExpiry);
+    targetDate.setHours(0, 0, 0, 0);
+
+    const nextDay = new Date(targetDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+
+    return await this.entryBalanceRepository
+      .createQueryBuilder('entry')
+      .leftJoinAndSelect('entry.customer', 'customer')
+      .where('entry.expiredAt >= :startOfDay', { startOfDay: targetDate })
+      .andWhere('entry.expiredAt < :endOfDay', { endOfDay: nextDay })
+      .andWhere('entry.originalPoints > entry.usedPoints')
+      .getMany();
+  }
+
   async customerBalance(customerId: string): Promise<number> {
     const now = new Date();
 
@@ -34,12 +53,13 @@ export class EntryBalanceRepository implements IEntryBalanceRepository {
 
     await this.entryBalanceRepository.save(newEntry);
   }
-  j;
+
   async findAvailableByCustomerId(customerId: string): Promise<EntryBalance[]> {
     const now = new Date();
 
     return await this.entryBalanceRepository
       .createQueryBuilder('entry')
+      .leftJoinAndSelect('entry.customer', 'customer')
       .where('entry.customerId = :customerId', { customerId })
       .andWhere('entry.expiredAt > :now', { now })
       .andWhere('entry.originalPoints > entry.usedPoints')

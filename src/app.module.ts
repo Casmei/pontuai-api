@@ -8,11 +8,13 @@ import { AuthModule } from './modules/auth/auth.module';
 import { RewardModule } from './modules/rewards/reward.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { SharedModule } from './modules/@shared/shared.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot(databaseConfig),
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
+    SharedModule,
     CustomerModule,
     TenantModule,
     AuthModule,

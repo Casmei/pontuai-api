@@ -1,7 +1,7 @@
-import { Either, Left, Right } from 'src/_utils/either';
-import { Usecase } from 'src/modules/@shared/interfaces/usecase';
-import { Transaction } from '../entities/transaction.entity';
-import { ITransactionRepository } from '../interfaces/transaction.repository';
+import { type Either, Left, Right } from 'src/_utils/either';
+import type { Usecase } from 'src/modules/@shared/interfaces/usecase';
+import type { Transaction } from '../entities/transaction.entity';
+import type { ITransactionRepository } from '../interfaces/transaction.repository';
 
 type Input = {
   tenantId: string;

@@ -9,7 +9,7 @@ export class Migrate {
   ) {}
 
   async migrate(): Promise<void> {
-    const tenantId = '07275dd6-940c-424a-b37e-bf2c38a1036c';
+    const tenantId = '023c679a-7b31-46ff-82cd-0ff2731481a5';
     const transactions = await this.transactionRepository.getAll(tenantId);
 
     for (const transaction of transactions) {

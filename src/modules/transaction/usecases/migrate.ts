@@ -53,10 +53,6 @@ export class Migrate {
           if (remaining <= 0) break;
         }
       }
-
-      if (transaction.id === '905144a9-8869-4172-a64a-f9bec686e78b') {
-        break;
-      }
     }
   }
 }

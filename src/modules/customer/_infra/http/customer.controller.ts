@@ -11,15 +11,17 @@ import { GetTenantId } from 'src/modules/auth/decorators/get-tenant.decorator'
 import { CreateCustomerDto } from './dtos/create-customer.dto'
 import { GetAllCustomersUseCase } from '../../usecases/get-all-customer.usecase'
 import { GetCustomerDetailUseCase } from '../../usecases/get-customer-detail.usecase'
-import { GetCustomerTransactionDetailUseCase } from '../../usecases/get-customer-transaction-detail.usecase'
 import {
   DocumentCreateCustomer,
   DocumentGetCustomerDetail,
   DocumentGetCustomers,
-  DocumentGetCustomerTransactionsDetail,
+  DocumentGetCustomerBalanceStats,
+  DocumentGetCustomerTransactions,
 } from '../decorators/customer-docs.decorator'
 import { DefaultPaginationQuery } from 'src/modules/@shared/decorators/default-pagination-query.decorator'
 import { PaginationQueryDto } from 'src/modules/@shared/dto/pagination-query.dto'
+import { GetCustomerBalanceStatsUseCase } from '../../usecases/get-customer-balance-stats.usecase'
+import { GetCustomerTransactionsUseCase } from '../../usecases/get-customer-transactions.usecase'
 
 @Controller('customers')
 export class CustomerController {
@@ -27,7 +29,8 @@ export class CustomerController {
     private readonly createCustomerUseCase: CreateCustomerUseCase,
     private readonly getAllCustomersUseCase: GetAllCustomersUseCase,
     private readonly getCustomerDetailUseCase: GetCustomerDetailUseCase,
-    private readonly getCustomerTransactionDetailUseCase: GetCustomerTransactionDetailUseCase,
+    private readonly getCustomerBalanceStatsUseCase: GetCustomerBalanceStatsUseCase,
+    private readonly getCustomerTransactionsUseCase: GetCustomerTransactionsUseCase,
   ) {}
 
   @Post()
@@ -88,20 +91,36 @@ export class CustomerController {
     return result.value
   }
 
-  @Get('/:customerId/transactions')
-  @DocumentGetCustomerTransactionsDetail()
-  async getCustomerTransactionsDetail(
+  @Get('/:customerId/balance-stats')
+  @DocumentGetCustomerBalanceStats()
+  async getCustomerBalanceStats(
     @GetTenantId() tenantId: string,
     @Param('customerId') customerId: string,
-    @DefaultPaginationQuery({ limitDefault: 5 }) query: PaginationQueryDto,
   ) {
-    const result = await this.getCustomerTransactionDetailUseCase.execute({
+    const result = await this.getCustomerBalanceStatsUseCase.execute({
       tenantId,
       customerId,
-      query: {
-        page: Number(query.page),
-        limit: Number(query.limit),
-      },
+    })
+
+    if (result.isLeft()) {
+      throw new BadRequestException(result.error.message)
+    }
+
+    return result.value
+  }
+
+  @Get('/:customerId/transactions')
+  @DocumentGetCustomerTransactions()
+  async getCustomerTransactions(
+    @GetTenantId() tenantId: string,
+    @Param('customerId') customerId: string,
+    @DefaultPaginationQuery({ hasSearch: false }) query: PaginationQueryDto,
+  ) {
+    console.log('getCustomerTransactions')
+    const result = await this.getCustomerTransactionsUseCase.execute({
+      tenantId,
+      customerId,
+      query,
     })
 
     if (result.isLeft()) {

@@ -7,10 +7,10 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-} from 'typeorm'
-import { Customer } from 'src/modules/customer/entities/customer.entity'
-import { Reward } from 'src/modules/rewards/entities/reward.entity'
-import { Tenant } from 'src/modules/tenant/entities/tenant.entity'
+} from 'typeorm';
+import { Customer } from 'src/modules/customer/entities/customer.entity';
+import { Reward } from 'src/modules/rewards/entities/reward.entity';
+import { Tenant } from 'src/modules/tenant/entities/tenant.entity';
 
 export enum TransactionEnum {
   OUTPUT = 'output',
@@ -20,56 +20,52 @@ export enum TransactionEnum {
 @Entity('transaction')
 export class Transaction extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string
+  id: string;
 
   @Column({
     type: 'enum',
     enum: TransactionEnum,
     nullable: false,
   })
-  type: TransactionEnum
+  type: TransactionEnum;
 
   @Column({ nullable: false })
-  points: number
+  points: number;
 
   @Column({ nullable: true, type: 'decimal' })
-  value?: number | null
+  value?: number | null;
 
   @Column({
     nullable: false,
   })
-  tenant_id: string
+  tenant_id: string;
 
-  @ManyToOne(
-    () => Tenant,
-    (tenant) => tenant.transactions,
-    {
-      onDelete: 'CASCADE',
-    },
-  )
+  @ManyToOne(() => Tenant, (tenant) => tenant.transactions, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'tenant_id' })
-  tenant: Tenant
+  tenant: Tenant;
 
   @Column({ nullable: true })
-  customerId: string
+  customerId: string;
 
   @ManyToOne(() => Customer, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'customerId' })
-  customer: Customer
+  customer: Customer;
 
   @Column({ nullable: true })
-  rewardId?: string
+  rewardId?: string;
 
   @ManyToOne(() => Reward, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'rewardId' })
-  reward: Reward
+  reward: Reward;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @Column({ type: 'date', nullable: true })
-  expiredAt: Date
+  expiredAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 }

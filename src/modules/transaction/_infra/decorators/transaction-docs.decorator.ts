@@ -1,7 +1,6 @@
-import { applyDecorators } from '@nestjs/common'
-import { ApiOperation, ApiResponse, ApiHeader } from '@nestjs/swagger'
-import { AddPointsResponse } from '../http/responses/AddPoints.response'
-import { TransactionResponse } from '../http/responses/get-all-invoices.response'
+import { applyDecorators } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiHeader } from '@nestjs/swagger';
+import { AddPointsResponse } from '../http/responses/AddPoints.response';
 
 export function DocumentCreateTransaction() {
   return applyDecorators(
@@ -14,18 +13,26 @@ export function DocumentCreateTransaction() {
     ApiHeader({ name: 'x-tenant-id', required: true }),
     ApiResponse({ status: 400, description: 'Bad request' }),
     ApiResponse({ status: 401, description: 'Unauthorized' }),
-  )
+  );
 }
 
 export function DocumentGetAllTransactions() {
   return applyDecorators(
-    ApiOperation({ summary: 'Find all transactions' }),
+    ApiOperation({ summary: 'Yeah bitch, surprise' }),
     ApiResponse({
       status: 200,
-      type: [TransactionResponse],
+    }),
+  );
+}
+
+export function DocumentRedemptionTransaction() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Create a reward redemption transaction' }),
+    ApiResponse({
+      status: 200,
     }),
     ApiHeader({ name: 'x-tenant-id', required: true }),
     ApiResponse({ status: 400, description: 'Bad request' }),
     ApiResponse({ status: 401, description: 'Unauthorized' }),
-  )
+  );
 }

@@ -1,8 +1,8 @@
 import { Either, Left, Right } from 'src/_utils/either'
 import { Usecase } from 'src/modules/@shared/interfaces/usecase'
 import { ICustomerRepository } from '../interfaces/customer.repository'
-import { ITransactionRepository } from 'src/modules/transaction/interfaces/transaction.repository'
 import { GetCustomerDetailResponse } from '../_infra/http/responses/get-customer-detail.response'
+import { IEntryBalanceRepository } from 'src/modules/transaction/interfaces/balance-entry.repository'
 
 type Input = {
   tenantId: string
@@ -14,7 +14,7 @@ type Output = Either<GetCustomerDetailResponse, Error>
 export class GetCustomerDetailUseCase implements Usecase<Input, Output> {
   constructor(
     private customerRepository: ICustomerRepository,
-    private transactionRepository: ITransactionRepository,
+    private entryBalanceRepository: IEntryBalanceRepository,
   ) {}
 
   async execute(input: Input): Promise<Output> {
@@ -26,16 +26,11 @@ export class GetCustomerDetailUseCase implements Usecase<Input, Output> {
 
       if (!customer) return Left.of(new Error('Failed to find customer'))
 
-      const points = await this.transactionRepository.sumAllTransactions(
-        customer.id,
-      )
-
       return Right.of({
         id: customer.id,
         name: customer.name,
         memberSince: customer.created_at,
         phone: customer.phone,
-        points,
         status: 'active',
         address: undefined,
         birthdate: undefined,

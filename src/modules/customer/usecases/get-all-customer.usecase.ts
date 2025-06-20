@@ -1,9 +1,8 @@
 import { Either, Left, Right } from 'src/_utils/either'
 import { Usecase } from 'src/modules/@shared/interfaces/usecase'
-import { Customer } from '../entities/customer.entity'
 import { ICustomerRepository } from '../interfaces/customer.repository'
-import { ITransactionRepository } from 'src/modules/transaction/interfaces/transaction.repository'
 import { PaginatedCustomerResponse } from '../_infra/http/responses/paginated-customer-response'
+import { IEntryBalanceRepository } from 'src/modules/transaction/interfaces/balance-entry.repository'
 
 type Input = {
   tenantId: string
@@ -17,36 +16,21 @@ type Input = {
 type Output = Either<PaginatedCustomerResponse, Error>
 
 export class GetAllCustomersUseCase implements Usecase<Input, Output> {
-  constructor(
-    private customerRepository: ICustomerRepository,
-    private transactionRepository: ITransactionRepository,
-  ) {}
+  constructor(private customerRepository: ICustomerRepository) {}
 
   async execute(input: Input): Promise<Output> {
     try {
-      const customers = await this.customerRepository.getAll(
+      const { data: customers, total } = await this.customerRepository.getAll(
         input.tenantId,
         input?.query,
       )
 
-      const customersWithPoints = await Promise.all(
-        customers.data.map(async (customer) => {
-          const points = await this.transactionRepository.sumAllTransactions(
-            customer.id,
-          )
-          return {
-            customer,
-            points,
-          }
-        }),
-      )
-
       const { page, limit } = input.query
-      const totalPages = Math.ceil(customers.total / limit)
+      const totalPages = Math.ceil(total / limit)
 
       const response: PaginatedCustomerResponse = {
-        data: customersWithPoints,
-        totalItems: customers.total,
+        customers,
+        totalItems: total,
         currentPage: page,
         totalPages,
       }

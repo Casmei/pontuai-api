@@ -26,12 +26,6 @@ export class GetCustomerDetailResponse {
   email?: string
 
   @ApiProperty({
-    description: 'Total loyalty or reward points accumulated by the member',
-    example: 45,
-  })
-  points: number
-
-  @ApiProperty({
     description: 'Date the member joined, in ISO format',
     example: '2023-03-22',
   })

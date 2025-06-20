@@ -1,13 +1,16 @@
-import { Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { MoreThan, Repository } from 'typeorm'
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import {
   addPointsType,
   getTransactionByCustomerId,
   ITransactionRepository,
   redeemReward,
-} from '../../interfaces/transaction.repository'
-import { Transaction, TransactionEnum } from '../../entities/transaction.entity'
+} from '../../interfaces/transaction.repository';
+import {
+  Transaction,
+  TransactionEnum,
+} from '../../entities/transaction.entity';
 
 @Injectable()
 export class TransactionRepository implements ITransactionRepository {
@@ -15,11 +18,22 @@ export class TransactionRepository implements ITransactionRepository {
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
   ) {}
+  async findInputsByCustomer(id: string) {
+    return await this.transactionRepository.find({
+      where: { type: TransactionEnum.INPUT, customerId: id },
+    });
+  }
+
+  async findOutputsByCustomer(id: string) {
+    return await this.transactionRepository.find({
+      where: { type: TransactionEnum.OUTPUT, customerId: id },
+    });
+  }
 
   async getByCustomerId(
     data: getTransactionByCustomerId,
   ): Promise<{ transactions: Transaction[]; total: number }> {
-    const skip = (data.query.page! - 1) * data.query.limit!
+    const skip = (data.query.page! - 1) * data.query.limit!;
 
     const [transactions, total] = await this.transactionRepository.findAndCount(
       {
@@ -29,9 +43,9 @@ export class TransactionRepository implements ITransactionRepository {
         skip,
         take: data.query.limit,
       },
-    )
+    );
 
-    return { transactions, total }
+    return { transactions, total };
   }
 
   redeemReward(data: redeemReward): Promise<Transaction> {
@@ -41,20 +55,9 @@ export class TransactionRepository implements ITransactionRepository {
       rewardId: data.reward.id,
       type: TransactionEnum.OUTPUT,
       tenant_id: data.tenantId,
-    })
+    });
 
-    return this.transactionRepository.save(transaction)
-  }
-
-  async sumAllTransactions(customerId: string): Promise<number> {
-    const now = new Date()
-
-    const sum = await this.transactionRepository.sum('points', {
-      customerId,
-      expiredAt: MoreThan(now),
-    })
-
-    return sum ?? 0
+    return this.transactionRepository.save(transaction);
   }
 
   addPoints(data: addPointsType): Promise<Transaction> {
@@ -65,15 +68,16 @@ export class TransactionRepository implements ITransactionRepository {
       tenant_id: data.tenantId,
       value: data.value,
       expiredAt: data.expiredAt,
-    })
+    });
 
-    return this.transactionRepository.save(transaction)
+    return this.transactionRepository.save(transaction);
   }
 
   async getAll(tenantId: string): Promise<Transaction[]> {
     return await this.transactionRepository.find({
       where: { tenant_id: tenantId },
       relations: ['customer', 'reward'],
-    })
+      order: { createdAt: 'ASC' },
+    });
   }
 }

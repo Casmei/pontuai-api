@@ -33,7 +33,12 @@ import {
 import { TenantModule } from '../tenant/tenant.module'
 import { NotifyCustomerWithPointsEvent } from './events/notify-customer-with-points.event'
 import { GetCustomerDetailUseCase } from './usecases/get-customer-detail.usecase'
-import { GetCustomerTransactionDetailUseCase } from './usecases/get-customer-transaction-detail.usecase'
+import { GetCustomerBalanceStatsUseCase } from './usecases/get-customer-balance-stats.usecase'
+import {
+  ENRTY_BALANCE_REPOSITORY,
+  IEntryBalanceRepository,
+} from '../transaction/interfaces/balance-entry.repository'
+import { GetCustomerTransactionsUseCase } from './usecases/get-customer-transactions.usecase'
 
 const otherProviders: Provider[] = [
   {
@@ -96,26 +101,36 @@ const useCases: Provider[] = [
   },
   {
     provide: GetAllCustomersUseCase,
-    useFactory: (
-      customerRepository: ICustomerRepository,
-      transactionRepository: ITransactionRepository,
-    ) => new GetAllCustomersUseCase(customerRepository, transactionRepository),
-    inject: [CUSTOMER_REPOSITORY, TRANSACTION_REPOSITORY],
+    useFactory: (customerRepository: ICustomerRepository) =>
+      new GetAllCustomersUseCase(customerRepository),
+    inject: [CUSTOMER_REPOSITORY],
   },
   {
     provide: GetCustomerDetailUseCase,
     useFactory: (
       customerRepository: ICustomerRepository,
-      transactionRepository: ITransactionRepository,
+      entryBalanceRepository: IEntryBalanceRepository,
     ) =>
-      new GetCustomerDetailUseCase(customerRepository, transactionRepository),
-    inject: [CUSTOMER_REPOSITORY, TRANSACTION_REPOSITORY],
+      new GetCustomerDetailUseCase(customerRepository, entryBalanceRepository),
+    inject: [CUSTOMER_REPOSITORY, ENRTY_BALANCE_REPOSITORY],
   },
   {
-    provide: GetCustomerTransactionDetailUseCase,
-    useFactory: (transactionRepository: ITransactionRepository) =>
-      new GetCustomerTransactionDetailUseCase(transactionRepository),
-    inject: [TRANSACTION_REPOSITORY],
+    provide: GetCustomerBalanceStatsUseCase,
+    useFactory: (entryBalanceRepository: IEntryBalanceRepository) =>
+      new GetCustomerBalanceStatsUseCase(entryBalanceRepository),
+    inject: [ENRTY_BALANCE_REPOSITORY],
+  },
+  {
+    provide: GetCustomerTransactionsUseCase,
+    useFactory: (
+      customerRepository: ICustomerRepository,
+      transactionRepository: ITransactionRepository,
+    ) =>
+      new GetCustomerTransactionsUseCase(
+        customerRepository,
+        transactionRepository,
+      ),
+    inject: [CUSTOMER_REPOSITORY, TRANSACTION_REPOSITORY],
   },
 ]
 

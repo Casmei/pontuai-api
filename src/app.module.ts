@@ -17,9 +17,9 @@ import { ScheduleModule } from '@nestjs/schedule';
     TenantModule,
     AuthModule,
     RewardModule,
-    TransactionModule
+    TransactionModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

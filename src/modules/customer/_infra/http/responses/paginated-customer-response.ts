@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { CustomerWithPointsResponse } from './get-all-customers.response'
+import { CustomerResponse } from './get-all-customers.response'
 
 export class PaginatedCustomerResponse {
   @ApiProperty({
     description: 'List of customers for the current page',
-    type: [CustomerWithPointsResponse],
+    type: [CustomerResponse],
   })
-  data: CustomerWithPointsResponse[]
+  customers: CustomerResponse[]
 
   @ApiProperty({
     description: 'Total number of customers available (all pages)',

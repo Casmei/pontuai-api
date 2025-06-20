@@ -34,33 +34,20 @@ export class CreateCustomerUseCase implements Usecase<Input, Output> {
       }
 
       const result = await this.customerRepository.create(data, tenantId);
+      await this.eventDispatcher.emitAsync('customer.created', {
+        customer: result,
+        tenantId,
+      });
 
       if (data.moneySpent) {
-        const transaction = await this.addPointsUseCase.execute({
+        await this.addPointsUseCase.execute({
           data: {
             customerId: result.id,
             moneySpent: data.moneySpent,
           },
           tenantId,
         });
-
-        if (transaction.isRight()) {
-          await this.eventDispatcher.emitAsync('customer.created-with-points', {
-            customer: result,
-            tenantId,
-            transaction: transaction.value,
-          });
-        } else {
-          return Left.of(transaction.error);
-        }
-
-        return Right.of(result);
       }
-
-      await this.eventDispatcher.emitAsync('customer.created', {
-        customer: result,
-        tenantId,
-      });
 
       return Right.of(result);
     } catch (error) {

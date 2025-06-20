@@ -6,6 +6,7 @@ import type { ICustomerRepository } from 'src/modules/customer/interfaces/custom
 import type { ITenantRepository } from 'src/modules/tenant/interfaces/tenant.repository';
 import type { AddPointsDto } from '../_infra/http/dtos/create-transaction.dto';
 import type { IEntryBalanceRepository } from '../interfaces/balance-entry.repository';
+import { EventDispatcher } from 'src/modules/@shared/interfaces/event-dispatcher';
 
 type Input = {
   data: AddPointsDto;
@@ -20,6 +21,7 @@ export class AddPointsUseCase implements Usecase<Input, Output> {
     private entryBalanceRepository: IEntryBalanceRepository,
     private tenantRepository: ITenantRepository,
     private customerRepository: ICustomerRepository,
+    private eventDispatcher: EventDispatcher,
   ) {}
 
   async execute(input: Input): Promise<Output> {
@@ -30,6 +32,7 @@ export class AddPointsUseCase implements Usecase<Input, Output> {
         data.customerId,
         tenantId,
       );
+
       if (!customer) {
         return Left.of(new Error('Cliente não encontrado.'));
       }
@@ -79,6 +82,17 @@ export class AddPointsUseCase implements Usecase<Input, Output> {
         originalPoints: points,
         usedPoints: 0,
         expiredAt,
+      });
+
+      const balance = await this.entryBalanceRepository.customerBalance(
+        customer.id,
+      );
+
+      await this.eventDispatcher.emitAsync('points.add', {
+        customer,
+        tenantId,
+        transaction,
+        balance,
       });
 
       return Right.of(transaction);

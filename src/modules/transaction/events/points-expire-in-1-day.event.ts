@@ -55,7 +55,7 @@ export class PointsExpireIn1DayEvent {
         `📅 Atenção: Seus *${transaction.availablePoints} pontos* vão expirar *amanhã*.\n\n` +
         `🛵 Que tal pedir um delivery hoje, ${customer.name}? Assim você acumula mais pontos sem sair de casa! 🍦✨\n\n` +
         `Aproveite para fazer seu pedido e garantir prêmios ou descontos deliciosos na Sorveteria Amigo! 🎁😋\n\n` +
-        `💙 Conte com a gente — na loja ou no conforto do seu lar!\n` +
+        `💚 Conte com a gente — na loja ou no conforto do seu lar!\n` +
         `— Equipe Sorveteria Amigo`;
 
       await this.whatsappService.sendMessage(message, customer.phone);

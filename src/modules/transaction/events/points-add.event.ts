@@ -3,22 +3,19 @@ import { EventDispatcher } from 'src/modules/@shared/interfaces/event-dispatcher
 import { IWhatsAppService } from 'src/modules/@shared/interfaces/whatsapp-service';
 import { Customer } from 'src/modules/customer/entities/customer.entity';
 import { ITenantRepository } from 'src/modules/tenant/interfaces/tenant.repository';
-import { EntryBalance } from '../entities/entry-balance.entity';
+import { Transaction } from '../entities/transaction.entity';
 
-export class PointsExpireIn3DaysEvent {
-  private readonly logger = new Logger(PointsExpireIn3DaysEvent.name);
+export class PointsAddEvent {
+  private readonly logger = new Logger(PointsAddEvent.name);
 
   constructor(
     private eventDispatcher: EventDispatcher,
     private whatsappService: IWhatsAppService,
     private tenantRepository: ITenantRepository,
   ) {
-    this.eventDispatcher.on('points.expiring-in-3-days', (data) => {
+    this.eventDispatcher.on('points.add', (data) => {
       this.handleOrderCreatedEvent(data).catch((err) => {
-        this.logger.error(
-          "Erro ao lidar com o evento: 'points.expiring-in-3-days'",
-          err,
-        );
+        this.logger.error("Erro ao lidar com o evento: 'points.add'", err);
       });
     });
   }
@@ -26,9 +23,10 @@ export class PointsExpireIn3DaysEvent {
   async handleOrderCreatedEvent(data: {
     customer: Customer;
     tenantId: string;
-    transaction: EntryBalance;
+    transaction: Transaction;
+    balance: number;
   }) {
-    const { customer, tenantId, transaction } = data;
+    const { customer, tenantId, transaction, balance } = data;
     this.logger.debug(`Iniciando notificação para o cliente ${customer?.id}`);
 
     try {
@@ -52,11 +50,9 @@ export class PointsExpireIn3DaysEvent {
       this.whatsappService.configureForTenant(tenantConfig.whatsapp_config);
 
       const message =
-        `👀 Ei ${customer.name}, olha só!\n\n` +
-        `🎯 Você está pertinho de aproveitar uma recompensa: *${transaction.availablePoints} pontos* seus expiram em *3 dias*.\n\n` +
-        `Que tal dar uma passadinha na Sorveteria Amigo para resgatar um prêmio delicioso ou acumular mais uns pontinhos e conquistar algo ainda melhor? 🍦✨\n\n` +
-        `🏃‍♂️🏃‍♀️ Vem rapidinho, estamos te esperando com muito sabor e carinho!\n\n` +
-        `— Equipe Sorveteria Amigo 💚`;
+        `🍦 Parabéns, ${customer.name}! Você ganhou *${transaction.points} pontos* na Sorveteria Amigo 🎉\n\n` +
+        `Agora você tem *${balance} pontos acumulados*! 🙌\n` +
+        `Junte mais e venha trocar por prêmios — na loja ou pelo delivery 🛵💚`;
 
       await this.whatsappService.sendMessage(message, customer.phone);
 

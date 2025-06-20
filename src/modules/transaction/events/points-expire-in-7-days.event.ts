@@ -55,7 +55,7 @@ export class PointsExpireIn7DaysEvent {
         `🔔 Olá ${customer.name}! Temos uma dica importante pra você:\n\n` +
         `📅 Você tem *${transaction.availablePoints} pontos* que irão expirar em *7 dias*.\n` +
         `Use seus pontos antes que eles se percam e aproveite para trocar por prêmios ou descontos na Sorveteria Amigo! 🍦🎁\n\n` +
-        `💙 Estamos te esperando!\n` +
+        `💚 Estamos te esperando!\n` +
         `— Equipe Sorveteria Amigo`;
 
       await this.whatsappService.sendMessage(message, customer.phone);

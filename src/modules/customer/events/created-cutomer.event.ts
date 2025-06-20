@@ -30,14 +30,13 @@ export class CreatedCustomerEvent {
       if (tenantConfig?.whatsapp_config) {
         this.whatsappService.configureForTenant(tenantConfig.whatsapp_config);
 
-        this.whatsappService.sendMessage(
-          `🍦 Olá ${data.customer.name}, que alegria ter você aqui!\n` +
-            `Você agora faz parte do nosso programa de fidelidade Amigo — onde cada visita é um passo a mais nessa amizade deliciosa.\n\n` +
-            `A cada compra, você acumula pontos que podem ser trocados por prêmios incríveis.\n` +
-            `Estamos te esperando para começar a pontuar! 💙\n\n` +
-            `— Equipe Sorveteria Amigo`,
-          data.customer.phone,
-        );
+        const message =
+          `🍦 Olá ${data.customer.name}, que alegria ter você com a gente! 💚\n\n` +
+          `Você agora faz parte do nosso programa de fidelidade *Amigo*, onde cada visita te aproxima de prêmios e experiências deliciosas! 😋\n\n` +
+          `Estamos te esperando na loja ou no delivery para começar essa amizade cheia de sabor 🛵🍨\n\n` +
+          `— Equipe Sorveteria Amigo`;
+
+        await this.whatsappService.sendMessage(message, data.customer.phone);
       }
     } catch (error) {
       console.error('Erro ao notificar usuário:', error);

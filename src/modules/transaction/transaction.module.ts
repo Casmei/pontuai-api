@@ -44,6 +44,7 @@ import {
 } from '../@shared/interfaces/whatsapp-service';
 import { PointsExpireIn3DaysEvent } from './events/points-expire-in-3-days.event';
 import { PointsExpireIn1DayEvent } from './events/points-expire-in-1-day.event';
+import { PointsAddEvent } from './events/points-add.event';
 
 const cron: Provider[] = [
   {
@@ -99,6 +100,15 @@ export const events: Provider[] = [
       ),
     inject: [EVENT_DISPATCHER, WHATSAPP_SERVICE, TENANT_REPOSITORY],
   },
+  {
+    provide: PointsAddEvent,
+    useFactory: (
+      eventDispatcher: EventDispatcher,
+      whatsAppService: IWhatsAppService,
+      tenantRepository: ITenantRepository,
+    ) => new PointsAddEvent(eventDispatcher, whatsAppService, tenantRepository),
+    inject: [EVENT_DISPATCHER, WHATSAPP_SERVICE, TENANT_REPOSITORY],
+  },
 ];
 
 const repositories: Provider[] = [
@@ -120,18 +130,21 @@ const useCases: Provider[] = [
       entryBalanceRepository: IEntryBalanceRepository,
       tenantRepository: ITenantRepository,
       customerRepository: ICustomerRepository,
+      dispatcher: EventDispatcher,
     ) =>
       new AddPointsUseCase(
         transactionRepository,
         entryBalanceRepository,
         tenantRepository,
         customerRepository,
+        dispatcher,
       ),
     inject: [
       TRANSACTION_REPOSITORY,
       ENRTY_BALANCE_REPOSITORY,
       TENANT_REPOSITORY,
       CUSTOMER_REPOSITORY,
+      EVENT_DISPATCHER,
     ],
   },
   {

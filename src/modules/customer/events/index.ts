@@ -12,7 +12,6 @@ import {
   ITenantRepository,
   TENANT_REPOSITORY,
 } from 'src/modules/tenant/interfaces/tenant.repository';
-import { CreatedCustomerWithPointsEvent } from './created-customer-with-points.event';
 
 export const events: Provider[] = [
   {
@@ -23,20 +22,6 @@ export const events: Provider[] = [
       tenantRepository: ITenantRepository,
     ) =>
       new CreatedCustomerEvent(
-        eventDispatcher,
-        whatsAppService,
-        tenantRepository,
-      ),
-    inject: [EVENT_DISPATCHER, WHATSAPP_SERVICE, TENANT_REPOSITORY],
-  },
-  {
-    provide: CreatedCustomerWithPointsEvent,
-    useFactory: (
-      eventDispatcher: EventDispatcher,
-      whatsAppService: IWhatsAppService,
-      tenantRepository: ITenantRepository,
-    ) =>
-      new CreatedCustomerWithPointsEvent(
         eventDispatcher,
         whatsAppService,
         tenantRepository,

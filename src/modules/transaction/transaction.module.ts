@@ -1,50 +1,50 @@
 import { forwardRef, Module, type Provider } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TransactionController } from './_infra/http/transaction.controller';
-import { Transaction } from './entities/transaction.entity';
-
-import { EntryBalanceRepository } from './_infra/database/balance-entry-typeorm.repository';
-import { RewardModule } from '../rewards/reward.module';
-import { EntryBalance } from './entities/entry-balance.entity';
 import {
   EVENT_DISPATCHER,
   type EventDispatcher,
 } from '../@shared/interfaces/event-dispatcher';
 import {
-  type ITransactionRepository,
-  TRANSACTION_REPOSITORY,
-} from './interfaces/transaction.repository';
-import {
-  ENRTY_BALANCE_REPOSITORY,
-  type IEntryBalanceRepository,
-} from './interfaces/balance-entry.repository';
-import { TransactionRepository } from './_infra/database/transaction-typeorm.repository';
-import { AddPointsUseCase } from './usecases/add-points.usecase';
-import {
-  type ITenantRepository,
-  TENANT_REPOSITORY,
-} from '../tenant/interfaces/tenant.repository';
+  IWhatsAppService,
+  WHATSAPP_SERVICE,
+} from '../@shared/interfaces/whatsapp-service';
+import { CustomerModule } from '../customer/customer.module';
 import {
   CUSTOMER_REPOSITORY,
   type ICustomerRepository,
 } from '../customer/interfaces/customer.repository';
-import { GetTransactionsUseCase } from './usecases/get-transactions.usecase';
-import { RedeemRewardUseCase } from './usecases/redeem-reward.usecase';
 import {
   type IRewardRepository,
   REWARD_REPOSITORY,
 } from '../rewards/interfaces/reward.repository';
-import { CustomerModule } from '../customer/customer.module';
+import { RewardModule } from '../rewards/reward.module';
+import {
+  type ITenantRepository,
+  TENANT_REPOSITORY,
+} from '../tenant/interfaces/tenant.repository';
 import { TenantModule } from '../tenant/tenant.module';
+import { EntryBalanceRepository } from './_infra/database/balance-entry-typeorm.repository';
+import { TransactionRepository } from './_infra/database/transaction-typeorm.repository';
+import { TransactionController } from './_infra/http/transaction.controller';
 import { PointsExpiryAlertCron } from './cron/points-expiry-alert.cron';
+import { EntryBalance } from './entities/entry-balance.entity';
+import { Transaction } from './entities/transaction.entity';
+import { PointsAddEvent } from './events/points-add.event';
+import { PointsExpireIn1DayEvent } from './events/points-expire-in-1-day.event';
+import { PointsExpireIn3DaysEvent } from './events/points-expire-in-3-days.event';
 import { PointsExpireIn7DaysEvent } from './events/points-expire-in-7-days.event';
 import {
-  IWhatsAppService,
-  WHATSAPP_SERVICE,
-} from '../@shared/interfaces/whatsapp-service';
-import { PointsExpireIn3DaysEvent } from './events/points-expire-in-3-days.event';
-import { PointsExpireIn1DayEvent } from './events/points-expire-in-1-day.event';
-import { PointsAddEvent } from './events/points-add.event';
+  ENRTY_BALANCE_REPOSITORY,
+  type IEntryBalanceRepository,
+} from './interfaces/balance-entry.repository';
+import {
+  type ITransactionRepository,
+  TRANSACTION_REPOSITORY,
+} from './interfaces/transaction.repository';
+import { AddPointsUseCase } from './usecases/add-points.usecase';
+import { GetTransactionsStatsUseCase } from './usecases/get-transactions-stats.usecase';
+import { GetTransactionsUseCase } from './usecases/get-transactions.usecase';
+import { RedeemRewardUseCase } from './usecases/redeem-reward.usecase';
 
 const cron: Provider[] = [
   {
@@ -176,6 +176,18 @@ const useCases: Provider[] = [
       EVENT_DISPATCHER,
       ENRTY_BALANCE_REPOSITORY,
     ],
+  },
+  {
+    provide: GetTransactionsStatsUseCase,
+    useFactory: (
+      entryBalanceRepository: IEntryBalanceRepository,
+      transactionRepository: ITransactionRepository,
+    ) =>
+      new GetTransactionsStatsUseCase(
+        entryBalanceRepository,
+        transactionRepository,
+      ),
+    inject: [ENRTY_BALANCE_REPOSITORY, TRANSACTION_REPOSITORY],
   },
 ];
 

@@ -1,15 +1,15 @@
-import { Either, Left, Right } from 'src/_utils/either'
-import { Usecase } from 'src/modules/@shared/interfaces/usecase'
-import { ICustomerRepository } from '../interfaces/customer.repository'
-import { GetCustomerDetailResponse } from '../_infra/http/responses/get-customer-detail.response'
-import { IEntryBalanceRepository } from 'src/modules/transaction/interfaces/balance-entry.repository'
+import { Either, Left, Right } from 'src/_utils/either';
+import { Usecase } from 'src/modules/@shared/interfaces/usecase';
+import { IEntryBalanceRepository } from 'src/modules/transaction/interfaces/balance-entry.repository';
+import { GetCustomerDetailResponse } from '../_infra/http/responses/get-customer-detail.response';
+import { ICustomerRepository } from '../interfaces/customer.repository';
 
 type Input = {
-  tenantId: string
-  customerId: string
-}
+  tenantId: string;
+  customerId: string;
+};
 
-type Output = Either<GetCustomerDetailResponse, Error>
+type Output = Either<GetCustomerDetailResponse, Error>;
 
 export class GetCustomerDetailUseCase implements Usecase<Input, Output> {
   constructor(
@@ -22,9 +22,9 @@ export class GetCustomerDetailUseCase implements Usecase<Input, Output> {
       const customer = await this.customerRepository.getById(
         input.tenantId,
         input.customerId,
-      )
+      );
 
-      if (!customer) return Left.of(new Error('Failed to find customer'))
+      if (!customer) return Left.of(new Error('Failed to find customer'));
 
       return Right.of({
         id: customer.id,
@@ -38,9 +38,9 @@ export class GetCustomerDetailUseCase implements Usecase<Input, Output> {
         preferences: undefined,
         tags: undefined,
         tier: undefined,
-      })
+      });
     } catch (_) {
-      return Left.of(new Error('Failed to create customer'))
+      return Left.of(new Error('Failed to create customer'));
     }
   }
 }

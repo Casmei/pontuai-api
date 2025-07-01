@@ -3,8 +3,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { IEntryBalanceRepository } from '../../interfaces/balance-entry.repository';
 import { EntryBalance } from '../../entities/entry-balance.entity';
+import { IEntryBalanceRepository } from '../../interfaces/balance-entry.repository';
 
 @Injectable()
 export class EntryBalanceRepository implements IEntryBalanceRepository {
@@ -12,6 +12,11 @@ export class EntryBalanceRepository implements IEntryBalanceRepository {
     @InjectRepository(EntryBalance)
     private entryBalanceRepository: Repository<EntryBalance>,
   ) {}
+
+  async getAll(tenantId: string): Promise<EntryBalance[]> {
+    return await this.entryBalanceRepository.findBy({ tenantId });
+  }
+
   async getByCustomerId(customerId: string): Promise<EntryBalance[]> {
     return await this.entryBalanceRepository.findBy({ customerId });
   }

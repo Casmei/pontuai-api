@@ -5,23 +5,25 @@ import {
   Get,
   Param,
   Post,
-} from '@nestjs/common'
-import { CreateCustomerUseCase } from '../../usecases/create-customer.usecase'
-import { GetTenantId } from 'src/modules/auth/decorators/get-tenant.decorator'
-import { CreateCustomerDto } from './dtos/create-customer.dto'
-import { GetAllCustomersUseCase } from '../../usecases/get-all-customer.usecase'
-import { GetCustomerDetailUseCase } from '../../usecases/get-customer-detail.usecase'
+} from '@nestjs/common';
+import { DefaultPaginationQuery } from 'src/modules/@shared/decorators/default-pagination-query.decorator';
+import { PaginationQueryDto } from 'src/modules/@shared/dto/pagination-query.dto';
+import { GetTenantId } from 'src/modules/auth/decorators/get-tenant.decorator';
+import { CreateCustomerUseCase } from '../../usecases/create-customer.usecase';
+import { GetAllCustomersUseCase } from '../../usecases/get-all-customer.usecase';
+import { GetCustomerBalanceStatsUseCase } from '../../usecases/get-customer-balance-stats.usecase';
+import { GetCustomerDetailUseCase } from '../../usecases/get-customer-detail.usecase';
+import { GetCustomerStatsUseCase } from '../../usecases/get-customer-stats.usecase';
+import { GetCustomerTransactionsUseCase } from '../../usecases/get-customer-transactions.usecase';
 import {
   DocumentCreateCustomer,
+  DocumentGetCustomerBalanceStats,
   DocumentGetCustomerDetail,
   DocumentGetCustomers,
-  DocumentGetCustomerBalanceStats,
+  DocumentGetCustomerStats,
   DocumentGetCustomerTransactions,
-} from '../decorators/customer-docs.decorator'
-import { DefaultPaginationQuery } from 'src/modules/@shared/decorators/default-pagination-query.decorator'
-import { PaginationQueryDto } from 'src/modules/@shared/dto/pagination-query.dto'
-import { GetCustomerBalanceStatsUseCase } from '../../usecases/get-customer-balance-stats.usecase'
-import { GetCustomerTransactionsUseCase } from '../../usecases/get-customer-transactions.usecase'
+} from '../decorators/customer-docs.decorator';
+import { CreateCustomerDto } from './dtos/create-customer.dto';
 
 @Controller('customers')
 export class CustomerController {
@@ -31,6 +33,7 @@ export class CustomerController {
     private readonly getCustomerDetailUseCase: GetCustomerDetailUseCase,
     private readonly getCustomerBalanceStatsUseCase: GetCustomerBalanceStatsUseCase,
     private readonly getCustomerTransactionsUseCase: GetCustomerTransactionsUseCase,
+    private readonly getCustomerStatsUseCase: GetCustomerStatsUseCase,
   ) {}
 
   @Post()
@@ -42,13 +45,13 @@ export class CustomerController {
     const result = await this.createCustomerUseCase.execute({
       data: customerDto,
       tenantId,
-    })
+    });
 
     if (result.isLeft()) {
-      throw new BadRequestException(result.error.message)
+      throw new BadRequestException(result.error.message);
     }
 
-    return result.value
+    return result.value;
   }
 
   @Get()
@@ -64,13 +67,13 @@ export class CustomerController {
         limit: Number(query.limit),
         term: query.search,
       },
-    })
+    });
 
     if (result.isLeft()) {
-      throw new BadRequestException(result.error.message)
+      throw new BadRequestException(result.error.message);
     }
 
-    return result.value
+    return result.value;
   }
 
   @Get('/:customerId')
@@ -82,13 +85,13 @@ export class CustomerController {
     const result = await this.getCustomerDetailUseCase.execute({
       tenantId,
       customerId,
-    })
+    });
 
     if (result.isLeft()) {
-      throw new BadRequestException(result.error.message)
+      throw new BadRequestException(result.error.message);
     }
 
-    return result.value
+    return result.value;
   }
 
   @Get('/:customerId/balance-stats')
@@ -100,13 +103,13 @@ export class CustomerController {
     const result = await this.getCustomerBalanceStatsUseCase.execute({
       tenantId,
       customerId,
-    })
+    });
 
     if (result.isLeft()) {
-      throw new BadRequestException(result.error.message)
+      throw new BadRequestException(result.error.message);
     }
 
-    return result.value
+    return result.value;
   }
 
   @Get('/:customerId/transactions')
@@ -116,17 +119,30 @@ export class CustomerController {
     @Param('customerId') customerId: string,
     @DefaultPaginationQuery({ hasSearch: false }) query: PaginationQueryDto,
   ) {
-    console.log('getCustomerTransactions')
     const result = await this.getCustomerTransactionsUseCase.execute({
       tenantId,
       customerId,
       query,
-    })
+    });
 
     if (result.isLeft()) {
-      throw new BadRequestException(result.error.message)
+      throw new BadRequestException(result.error.message);
     }
 
-    return result.value
+    return result.value;
+  }
+
+  @Get('/stats')
+  @DocumentGetCustomerStats()
+  async getCustomerStats(@GetTenantId() tenantId: string) {
+    const result = await this.getCustomerStatsUseCase.execute({
+      tenantId,
+    });
+
+    if (result.isLeft()) {
+      throw new BadRequestException(result.error.message);
+    }
+
+    return result.value;
   }
 }

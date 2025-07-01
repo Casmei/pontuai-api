@@ -19,4 +19,5 @@ export interface ICustomerRepository {
     },
   ): Promise<{ data: Customer[]; total: number }>;
   getById(tenantId: string, customerId: string): Promise<Customer | null>;
+  getTotal(tenantId: string): Promise<number>;
 }

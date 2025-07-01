@@ -1,26 +1,27 @@
 import { Provider } from '@nestjs/common';
-import { CreateCustomerUseCase } from './create-customer.usecase';
-import {
-  CUSTOMER_REPOSITORY,
-  ICustomerRepository,
-} from '../interfaces/customer.repository';
 import {
   EVENT_DISPATCHER,
   EventDispatcher,
 } from 'src/modules/@shared/interfaces/event-dispatcher';
-import { AddPointsUseCase } from 'src/modules/transaction/usecases/add-points.usecase';
-import { GetAllCustomersUseCase } from './get-all-customer.usecase';
-import { GetCustomerDetailUseCase } from './get-customer-detail.usecase';
 import {
   ENRTY_BALANCE_REPOSITORY,
   IEntryBalanceRepository,
 } from 'src/modules/transaction/interfaces/balance-entry.repository';
-import { GetCustomerBalanceStatsUseCase } from './get-customer-balance-stats.usecase';
-import { GetCustomerTransactionsUseCase } from './get-customer-transactions.usecase';
 import {
   ITransactionRepository,
   TRANSACTION_REPOSITORY,
 } from 'src/modules/transaction/interfaces/transaction.repository';
+import { AddPointsUseCase } from 'src/modules/transaction/usecases/add-points.usecase';
+import {
+  CUSTOMER_REPOSITORY,
+  ICustomerRepository,
+} from '../interfaces/customer.repository';
+import { CreateCustomerUseCase } from './create-customer.usecase';
+import { GetAllCustomersUseCase } from './get-all-customer.usecase';
+import { GetCustomerBalanceStatsUseCase } from './get-customer-balance-stats.usecase';
+import { GetCustomerDetailUseCase } from './get-customer-detail.usecase';
+import { GetCustomerStatsUseCase } from './get-customer-stats.usecase';
+import { GetCustomerTransactionsUseCase } from './get-customer-transactions.usecase';
 
 export const useCases: Provider[] = [
   {
@@ -64,5 +65,11 @@ export const useCases: Provider[] = [
         transactionRepository,
       ),
     inject: [CUSTOMER_REPOSITORY, TRANSACTION_REPOSITORY],
+  },
+  {
+    provide: GetCustomerStatsUseCase,
+    useFactory: (customerRepository: ICustomerRepository) =>
+      new GetCustomerStatsUseCase(customerRepository),
+    inject: [CUSTOMER_REPOSITORY],
   },
 ];

@@ -11,6 +11,9 @@ export class CustomerRepository implements ICustomerRepository {
     @InjectRepository(Customer)
     private customerRepository: Repository<Customer>,
   ) {}
+  async getTotal(tenantId: string): Promise<number> {
+    return this.customerRepository.countBy({ tenant_id: tenantId });
+  }
   async findAll(): Promise<Customer[] | null> {
     return await this.customerRepository.find();
   }

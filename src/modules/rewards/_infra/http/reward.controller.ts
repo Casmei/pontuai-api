@@ -1,21 +1,14 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common'
-import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { CreateRewardUseCase } from '../../usecases/create-reward.usecase'
-import { CreateRewardDto } from './dtos/create-reward.dto'
-import { GetTenantId } from 'src/modules/auth/decorators/get-tenant.decorator'
-import { CreateRewardResponse } from './responses/create-reward.response'
-import { GetAllRewardsUseCase } from '../../usecases/get-all-reward.usecase'
-import { RedeemRewardDto } from '../../../transaction/_infra/http/dtos/redeem-reward.dto'
-import { UpdateRewardUseCase } from '../../usecases/update-reward.usecase'
-import { UpdateRewardDto } from './dtos/update-reward.dto'
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { GetTenantId } from 'src/modules/auth/decorators/get-tenant.decorator';
+import { CreateRewardUseCase } from '../../usecases/create-reward.usecase';
+import { GetAllRewardsUseCase } from '../../usecases/get-all-reward.usecase';
+import { GetRewardStatsUseCase } from '../../usecases/get-reward-stats.usecase';
+import { UpdateRewardUseCase } from '../../usecases/update-reward.usecase';
+import { CreateRewardDto } from './dtos/create-reward.dto';
+import { UpdateRewardDto } from './dtos/update-reward.dto';
+import { CreateRewardResponse } from './responses/create-reward.response';
+import { GetRewardStatsResponse } from './responses/get-reward-stats.response';
 
 @ApiTags('Reward')
 @Controller('reward')
@@ -24,6 +17,7 @@ export class RewardController {
     private createRewardUseCase: CreateRewardUseCase,
     private getAllRewardsUseCase: GetAllRewardsUseCase,
     private updateRewardsUseCase: UpdateRewardUseCase,
+    private getRewardStatsUseCase: GetRewardStatsUseCase,
   ) {}
 
   @Post()
@@ -40,10 +34,10 @@ export class RewardController {
     const result = await this.createRewardUseCase.execute({
       data,
       tenantId,
-    })
+    });
 
     if (result.isRight()) {
-      return result.value
+      return result.value;
     }
   }
 
@@ -59,10 +53,29 @@ export class RewardController {
   async all(@GetTenantId() tenantId: string) {
     const result = await this.getAllRewardsUseCase.execute({
       tenantId,
-    })
+    });
 
     if (result.isRight()) {
-      return result.value
+      return result.value;
+    }
+  }
+
+  @Get('/stats')
+  @ApiOperation({ summary: 'Get reward stats' })
+  @ApiResponse({
+    status: 200,
+    type: [GetRewardStatsResponse],
+  })
+  @ApiHeader({ name: 'x-tenant-id', required: true })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getRewardStats(@GetTenantId() tenantId: string) {
+    const result = await this.getRewardStatsUseCase.execute({
+      tenantId,
+    });
+
+    if (result.isRight()) {
+      return result.value;
     }
   }
 
@@ -83,10 +96,10 @@ export class RewardController {
       rewardId,
       data,
       tenantId,
-    })
+    });
 
     if (result.isRight()) {
-      return result.value
+      return result.value;
     }
   }
 }

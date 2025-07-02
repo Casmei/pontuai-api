@@ -1,6 +1,7 @@
+import { PaginationQueryDto } from 'src/modules/@shared/dto/pagination-query.dto';
+import { GetRewardStatsResponse } from 'src/modules/rewards/_infra/http/responses/get-reward-stats.response';
 import { Reward } from 'src/modules/rewards/entities/reward.entity';
 import { Transaction } from '../entities/transaction.entity';
-import { PaginationQueryDto } from 'src/modules/@shared/dto/pagination-query.dto';
 
 export const TRANSACTION_REPOSITORY = 'TRANSACTION_REPOSITORY';
 
@@ -37,4 +38,6 @@ export interface ITransactionRepository {
   findInputsByCustomer(id: string): Promise<Transaction[] | null>;
 
   findOutputsByCustomer(id: string): Promise<Transaction[] | null>;
+
+  getGroupedRewards(tenantId: string): Promise<GetRewardStatsResponse[]>;
 }

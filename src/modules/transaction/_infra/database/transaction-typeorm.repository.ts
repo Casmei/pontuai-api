@@ -2,15 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
+  Transaction,
+  TransactionEnum,
+} from '../../entities/transaction.entity';
+import {
   addPointsType,
   getTransactionByCustomerId,
   ITransactionRepository,
   redeemReward,
 } from '../../interfaces/transaction.repository';
-import {
-  Transaction,
-  TransactionEnum,
-} from '../../entities/transaction.entity';
 
 @Injectable()
 export class TransactionRepository implements ITransactionRepository {
@@ -18,6 +18,23 @@ export class TransactionRepository implements ITransactionRepository {
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
   ) {}
+
+  async getGroupedRewards(tenantId: string) {
+    const result = await Transaction.createQueryBuilder('transaction')
+      .select('reward.name', 'rewardName')
+      .addSelect('COUNT(*)', 'total')
+      .innerJoin('transaction.reward', 'reward')
+      .where('transaction.tenant_id = :tenantId', { tenantId })
+      .andWhere('transaction.rewardId IS NOT NULL')
+      .groupBy('reward.name')
+      .getRawMany();
+
+    return result.map((row) => ({
+      name: row.rewardName,
+      total: Number(row.total),
+    }));
+  }
+
   async findInputsByCustomer(id: string) {
     return await this.transactionRepository.find({
       where: { type: TransactionEnum.INPUT, customerId: id },

@@ -1,4 +1,4 @@
-import { WhatsappConfig } from 'src/modules/tenant/entities/tenant-config';
+import { WhatsappConfig } from 'src/modules/tenant/entities/tenant-config.entity';
 import { IWhatsAppService } from '../interfaces/whatsapp-service';
 
 export class EvolutionService implements IWhatsAppService {

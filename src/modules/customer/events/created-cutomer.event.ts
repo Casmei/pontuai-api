@@ -1,45 +1,73 @@
+import { Logger } from '@nestjs/common';
+import { renderTemplate } from 'src/_utils/whatsapp-template';
 import { EventDispatcher } from 'src/modules/@shared/interfaces/event-dispatcher';
-import { Customer } from '../entities/customer.entity';
 import { IWhatsAppService } from 'src/modules/@shared/interfaces/whatsapp-service';
+import {
+  WhatsappNotificationTemplate,
+  WhatsappNotificationType,
+} from 'src/modules/tenant/entities/tenant-config.entity';
 import { ITenantRepository } from 'src/modules/tenant/interfaces/tenant.repository';
+import { Customer } from '../entities/customer.entity';
 
 export class CreatedCustomerEvent {
+  private readonly logger = new Logger(CreatedCustomerEvent.name);
+
   constructor(
     private eventDispatcher: EventDispatcher,
     private whatsappService: IWhatsAppService,
     private tenantRepository: ITenantRepository,
   ) {
     this.eventDispatcher.on('customer.created', (data) => {
-      this.handleOrderCreatedEvent(data).catch((err) => {
-        console.error(
-          "Erro ao lidar com o evento: 'customer.created-with-points'",
-          err,
+      this.handleCustomerCreatedEvent(data).catch((err) => {
+        this.logger.error(
+          "Erro ao lidar com o evento: 'customer.created'",
+          err.stack || err,
         );
       });
     });
   }
-  async handleOrderCreatedEvent(data: {
+
+  async handleCustomerCreatedEvent(data: {
     customer: Customer;
     tenantId: string;
   }) {
+    const { customer, tenantId } = data;
+    this.logger.debug(`Iniciando notificação para o cliente '${customer.id}'`);
+
     try {
-      const tenantConfig = await this.tenantRepository.getTenantConfig(
-        data.tenantId,
+      const tenantConfig =
+        await this.tenantRepository.getTenantConfig(tenantId);
+
+      const template: WhatsappNotificationTemplate | undefined =
+        tenantConfig?.whatsapp_notification?.[
+          WhatsappNotificationType.CUSTOMER_NEW
+        ];
+
+      if (!tenantConfig?.whatsapp_config || !template) {
+        this.logger.warn(
+          `Configuração de WhatsApp '${WhatsappNotificationType.CUSTOMER_NEW}' não encontrada para tenant ${tenantId}`,
+        );
+        return;
+      }
+
+      this.whatsappService.configureForTenant(tenantConfig.whatsapp_config);
+
+      const variableValues: Record<string, string> = {
+        customer_name: customer.name,
+      };
+
+      const renderedMessage = renderTemplate(
+        template.defaultMessage,
+        variableValues,
       );
 
-      if (tenantConfig?.whatsapp_config) {
-        this.whatsappService.configureForTenant(tenantConfig.whatsapp_config);
+      await this.whatsappService.sendMessage(renderedMessage, customer.phone);
 
-        const message =
-          `🍦 Olá ${data.customer.name}, que alegria ter você com a gente! 💚\n\n` +
-          `Você agora faz parte do nosso programa de fidelidade *Amigo*, onde cada visita te aproxima de prêmios e experiências deliciosas! 😋\n\n` +
-          `Estamos te esperando na loja ou no delivery para começar essa amizade cheia de sabor 🛵🍨\n\n` +
-          `— Equipe Sorveteria Amigo`;
-
-        await this.whatsappService.sendMessage(message, data.customer.phone);
-      }
+      this.logger.log(
+        `Mensagem enviada para ${customer.phone} com template ${WhatsappNotificationType.CUSTOMER_NEW}`,
+      );
     } catch (error) {
-      console.error('Erro ao notificar usuário:', error);
+      this.logger.error('Erro ao notificar usuário:', error.stack || error);
     }
   }
 }

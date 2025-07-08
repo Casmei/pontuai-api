@@ -33,6 +33,7 @@ import { PointsAddEvent } from './events/points-add.event';
 import { PointsExpireIn1DayEvent } from './events/points-expire-in-1-day.event';
 import { PointsExpireIn3DaysEvent } from './events/points-expire-in-3-days.event';
 import { PointsExpireIn7DaysEvent } from './events/points-expire-in-7-days.event';
+import { RedeemRewardEvent } from './events/redeem-reward.event';
 import {
   ENRTY_BALANCE_REPOSITORY,
   type IEntryBalanceRepository,
@@ -107,6 +108,16 @@ export const events: Provider[] = [
       whatsAppService: IWhatsAppService,
       tenantRepository: ITenantRepository,
     ) => new PointsAddEvent(eventDispatcher, whatsAppService, tenantRepository),
+    inject: [EVENT_DISPATCHER, WHATSAPP_SERVICE, TENANT_REPOSITORY],
+  },
+  {
+    provide: RedeemRewardEvent,
+    useFactory: (
+      eventDispatcher: EventDispatcher,
+      whatsAppService: IWhatsAppService,
+      tenantRepository: ITenantRepository,
+    ) =>
+      new RedeemRewardEvent(eventDispatcher, whatsAppService, tenantRepository),
     inject: [EVENT_DISPATCHER, WHATSAPP_SERVICE, TENANT_REPOSITORY],
   },
 ];

@@ -1,10 +1,10 @@
 import { Either, Left, Right } from 'src/_utils/either';
-import { Usecase } from 'src/modules/@shared/interfaces/usecase';
-import { ITransactionRepository } from 'src/modules/transaction/interfaces/transaction.repository';
-import { ICustomerRepository } from 'src/modules/customer/interfaces/customer.repository';
 import { EventDispatcher } from 'src/modules/@shared/interfaces/event-dispatcher';
-import { RedeemRewardDto } from 'src/modules/transaction/_infra/http/dtos/redeem-reward.dto';
+import { Usecase } from 'src/modules/@shared/interfaces/usecase';
+import { ICustomerRepository } from 'src/modules/customer/interfaces/customer.repository';
 import { IRewardRepository } from 'src/modules/rewards/interfaces/reward.repository';
+import { RedeemRewardDto } from 'src/modules/transaction/_infra/http/dtos/redeem-reward.dto';
+import { ITransactionRepository } from 'src/modules/transaction/interfaces/transaction.repository';
 import { IEntryBalanceRepository } from '../interfaces/balance-entry.repository';
 
 type Output = Either<boolean, Error>;
@@ -82,6 +82,16 @@ export class RedeemRewardUseCase implements Usecase<Input, Output> {
         customerId: customer.id,
         reward,
         tenantId: input.tenantId,
+      });
+
+      await this.eventDispatcher.emitAsync('reward.redeem', {
+        customer,
+        reward,
+        tenantId: input.tenantId,
+        pointsUsed: reward.point_value,
+        remainingPoints: await this.entryBalanceRepository.customerBalance(
+          customer.id,
+        ),
       });
 
       return Right.of(true);

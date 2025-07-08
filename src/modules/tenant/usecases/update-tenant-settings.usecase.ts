@@ -1,10 +1,10 @@
-import { Either, Left, Right } from 'src/_utils/either'
-import { Usecase } from 'src/modules/@shared/interfaces/usecase'
-import { ITenantRepository } from '../interfaces/tenant.repository'
-import { UpdateTenantSettingsDto } from '../_infra/http/Dtos/update-tenant-settings.dto'
-import { JwtPayload } from 'src/modules/auth/types/auth.types'
+import { Either, Left, Right } from 'src/_utils/either';
+import { Usecase } from 'src/modules/@shared/interfaces/usecase';
+import { JwtPayload } from 'src/modules/auth/types/auth.types';
+import { UpdateTenantSettingsDto } from '../_infra/http/Dtos/update-tenant-settings.dto';
+import { ITenantRepository } from '../interfaces/tenant.repository';
 
-type Output = Either<void | null, Error>
+type Output = Either<void | null, Error>;
 
 export class UpdateTenantSettingsUseCase
   implements
@@ -16,9 +16,9 @@ export class UpdateTenantSettingsUseCase
   constructor(private tenantRepository: ITenantRepository) {}
 
   async execute(input: {
-    data: UpdateTenantSettingsDto
-    tenantId: string
-    user: JwtPayload
+    data: UpdateTenantSettingsDto;
+    tenantId: string;
+    user: JwtPayload;
   }): Promise<Output> {
     try {
       if (
@@ -26,14 +26,14 @@ export class UpdateTenantSettingsUseCase
       ) {
         throw new Error(
           'This user does not have permission to update the settings',
-        )
+        );
       }
 
-      await this.tenantRepository.updateSettings(input.data, input.tenantId)
-      return Right.of(null)
+      await this.tenantRepository.updateSettings(input.data, input.tenantId);
+      return Right.of(null);
     } catch (error) {
-      console.log(error)
-      return Left.of(new Error('Failed to get tenant'))
+      console.log(error);
+      return Left.of(new Error('Failed to get tenant'));
     }
   }
 }

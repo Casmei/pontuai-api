@@ -8,32 +8,31 @@ import {
   WhatsappNotificationType,
 } from 'src/modules/tenant/entities/tenant-config.entity';
 import { ITenantRepository } from 'src/modules/tenant/interfaces/tenant.repository';
-import { EntryBalance } from '../entities/entry-balance.entity';
+import { Reward } from '../../rewards/entities/reward.entity';
 
-export class PointsExpireIn1DayEvent {
-  private readonly logger = new Logger(PointsExpireIn1DayEvent.name);
+export class RedeemRewardEvent {
+  private readonly logger = new Logger(RedeemRewardEvent.name);
 
   constructor(
     private eventDispatcher: EventDispatcher,
     private whatsappService: IWhatsAppService,
     private tenantRepository: ITenantRepository,
   ) {
-    this.eventDispatcher.on('points.expiring-in-1-days', (data) => {
-      this.handlePointsExpiringEvent(data).catch((err) => {
-        this.logger.error(
-          "Erro ao lidar com o evento: 'points.expiring-in-1-days'",
-          err,
-        );
-      });
-    });
+    this.eventDispatcher.on('reward.redeem', (data) =>
+      this.handleRedeemRewardEvent(data).catch((err) => {
+        this.logger.error("Erro ao lidar com o evento: 'reward.redeem'", err);
+      }),
+    );
   }
 
-  async handlePointsExpiringEvent(data: {
+  async handleRedeemRewardEvent(data: {
     customer: Customer;
+    reward: Reward;
     tenantId: string;
-    transaction: EntryBalance;
+    pointsUsed: number;
+    remainingPoints: number;
   }) {
-    const { customer, tenantId, transaction } = data;
+    const { customer, reward, tenantId, pointsUsed, remainingPoints } = data;
     this.logger.debug(`Iniciando notificação para o cliente '${customer?.id}'`);
 
     try {
@@ -47,21 +46,14 @@ export class PointsExpireIn1DayEvent {
         return;
       }
 
-      if (!customer.phone) {
-        this.logger.warn(
-          `Cliente ${customer.id} não possui número de telefone.`,
-        );
-        return;
-      }
-
       const template: WhatsappNotificationTemplate | undefined =
         tenantConfig?.whatsapp_notification?.[
-          WhatsappNotificationType.POINTS_EXPIRING_1_DAYS
+          WhatsappNotificationType.TRANSACTION_REDEEM_POINTS
         ];
 
       if (!template) {
         this.logger.warn(
-          `Template '${WhatsappNotificationType.POINTS_EXPIRING_1_DAYS}' não encontrado para o tenant ${tenantId}`,
+          `Template '${WhatsappNotificationType.TRANSACTION_REDEEM_POINTS}' não encontrado para o tenant ${tenantId}`,
         );
         return;
       }
@@ -70,7 +62,9 @@ export class PointsExpireIn1DayEvent {
 
       const variableValues: Record<string, string> = {
         customer_name: customer.name,
-        points_expiring: transaction.availablePoints.toString(),
+        reward_name: reward.name,
+        points_used: pointsUsed.toString(),
+        remaining_points: remainingPoints.toString(),
       };
 
       const renderedMessage = renderTemplate(
@@ -81,11 +75,11 @@ export class PointsExpireIn1DayEvent {
       await this.whatsappService.sendMessage(renderedMessage, customer.phone);
 
       this.logger.log(
-        `Mensagem enviada com sucesso para ${customer.name} (${customer.phone})`,
+        `Mensagem de resgate enviada com sucesso para ${customer.name} (${customer.phone})`,
       );
     } catch (error) {
       this.logger.error(
-        `Erro ao enviar mensagem para o cliente ${customer?.id}:`,
+        `Erro ao enviar mensagem de resgate para o cliente ${customer?.id}:`,
         error.stack || error,
       );
     }

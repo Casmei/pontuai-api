@@ -1,8 +1,8 @@
 import { Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import type { IEntryBalanceRepository } from '../interfaces/balance-entry.repository';
 import { EventDispatcher } from 'src/modules/@shared/interfaces/event-dispatcher';
 import { EntryBalance } from '../entities/entry-balance.entity';
+import type { IEntryBalanceRepository } from '../interfaces/balance-entry.repository';
 
 export class PointsExpiryAlertCron {
   private readonly logger = new Logger(PointsExpiryAlertCron.name);

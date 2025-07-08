@@ -1,12 +1,12 @@
 import { type Either, Left, Right } from 'src/_utils/either';
+import { EventDispatcher } from 'src/modules/@shared/interfaces/event-dispatcher';
 import type { Usecase } from 'src/modules/@shared/interfaces/usecase';
-import type { Transaction } from '../entities/transaction.entity';
-import type { ITransactionRepository } from '../interfaces/transaction.repository';
 import type { ICustomerRepository } from 'src/modules/customer/interfaces/customer.repository';
 import type { ITenantRepository } from 'src/modules/tenant/interfaces/tenant.repository';
 import type { AddPointsDto } from '../_infra/http/dtos/create-transaction.dto';
+import type { Transaction } from '../entities/transaction.entity';
 import type { IEntryBalanceRepository } from '../interfaces/balance-entry.repository';
-import { EventDispatcher } from 'src/modules/@shared/interfaces/event-dispatcher';
+import type { ITransactionRepository } from '../interfaces/transaction.repository';
 
 type Input = {
   data: AddPointsDto;

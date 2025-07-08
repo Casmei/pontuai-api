@@ -1,7 +1,12 @@
 import { Logger } from '@nestjs/common';
+import { renderTemplate } from 'src/_utils/whatsapp-template';
 import { EventDispatcher } from 'src/modules/@shared/interfaces/event-dispatcher';
 import { IWhatsAppService } from 'src/modules/@shared/interfaces/whatsapp-service';
 import { Customer } from 'src/modules/customer/entities/customer.entity';
+import {
+  WhatsappNotificationTemplate,
+  WhatsappNotificationType,
+} from 'src/modules/tenant/entities/tenant-config.entity';
 import { ITenantRepository } from 'src/modules/tenant/interfaces/tenant.repository';
 import { EntryBalance } from '../entities/entry-balance.entity';
 
@@ -14,7 +19,7 @@ export class PointsExpireIn7DaysEvent {
     private tenantRepository: ITenantRepository,
   ) {
     this.eventDispatcher.on('points.expiring-in-7-days', (data) => {
-      this.handleOrderCreatedEvent(data).catch((err) => {
+      this.handlePointsExpiringEvent(data).catch((err) => {
         this.logger.error(
           "Erro ao lidar com o evento: 'points.expiring-in-7-days'",
           err,
@@ -23,13 +28,13 @@ export class PointsExpireIn7DaysEvent {
     });
   }
 
-  async handleOrderCreatedEvent(data: {
+  async handlePointsExpiringEvent(data: {
     customer: Customer;
     tenantId: string;
     transaction: EntryBalance;
   }) {
     const { customer, tenantId, transaction } = data;
-    this.logger.debug(`Iniciando notificação para o cliente ${customer?.id}`);
+    this.logger.debug(`Iniciando notificação para o cliente '${customer?.id}'`);
 
     try {
       const tenantConfig =
@@ -49,22 +54,40 @@ export class PointsExpireIn7DaysEvent {
         return;
       }
 
+      const template: WhatsappNotificationTemplate | undefined =
+        tenantConfig?.whatsapp_notification?.[
+          WhatsappNotificationType.POINTS_EXPIRING_7_DAYS
+        ];
+
+      if (!template) {
+        this.logger.warn(
+          `Template '${WhatsappNotificationType.POINTS_EXPIRING_7_DAYS}' não encontrado para o tenant ${tenantId}`,
+        );
+        return;
+      }
+
       this.whatsappService.configureForTenant(tenantConfig.whatsapp_config);
 
-      const message =
-        `🔔 Olá ${customer.name}! Temos uma dica importante pra você:\n\n` +
-        `📅 Você tem *${transaction.availablePoints} pontos* que irão expirar em *7 dias*.\n` +
-        `Use seus pontos antes que eles se percam e aproveite para trocar por prêmios ou descontos na Sorveteria Amigo! 🍦🎁\n\n` +
-        `💚 Estamos te esperando!\n` +
-        `— Equipe Sorveteria Amigo`;
+      const variableValues: Record<string, string> = {
+        customer_name: customer.name,
+        points_expiring: transaction.availablePoints.toString(),
+      };
 
-      await this.whatsappService.sendMessage(message, customer.phone);
+      const renderedMessage = renderTemplate(
+        template.defaultMessage,
+        variableValues,
+      );
+
+      await this.whatsappService.sendMessage(renderedMessage, customer.phone);
 
       this.logger.log(
         `Mensagem enviada com sucesso para ${customer.name} (${customer.phone})`,
       );
     } catch (error) {
-      this.logger.error(`Erro ao enviar mensagem para ${customer?.id}:`, error);
+      this.logger.error(
+        `Erro ao enviar mensagem para o cliente ${customer?.id}:`,
+        error.stack || error,
+      );
     }
   }
 }

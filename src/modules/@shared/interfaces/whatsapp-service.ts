@@ -1,4 +1,4 @@
-import { WhatsappConfig } from 'src/modules/tenant/entities/tenant-config';
+import { WhatsappConfig } from 'src/modules/tenant/entities/tenant-config.entity';
 
 export const WHATSAPP_SERVICE = 'WHATSAPP_SERVICE';
 

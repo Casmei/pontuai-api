@@ -1,10 +1,10 @@
 import { Either, Left, Right } from 'src/_utils/either';
 import { EventDispatcher } from 'src/modules/@shared/interfaces/event-dispatcher';
 import { Usecase } from 'src/modules/@shared/interfaces/usecase';
-import { Customer } from '../entities/customer.entity';
-import { CreateCustomerDto } from '../_infra/http/dtos/create-customer.dto';
-import { ICustomerRepository } from '../interfaces/customer.repository';
 import { AddPointsUseCase } from 'src/modules/transaction/usecases/add-points.usecase';
+import { CreateCustomerDto } from '../_infra/http/dtos/create-customer.dto';
+import { Customer } from '../entities/customer.entity';
+import { ICustomerRepository } from '../interfaces/customer.repository';
 
 type Input = {
   data: CreateCustomerDto;

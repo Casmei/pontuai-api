@@ -8,17 +8,27 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiHeader,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+} from '@nestjs/swagger';
+import { GetTenantId } from 'src/modules/auth/decorators/get-tenant.decorator';
 import { GetUser } from 'src/modules/auth/decorators/get-user.decorator';
 import { JwtPayload } from 'src/modules/auth/types/auth.types';
 import { SkipTenantCheck } from '../../decorator/skip-tenant-check';
 import { CreateTenantUseCase } from '../../usecases/create-tenant';
 import { GetMyTenantsUseCase } from '../../usecases/get-my-tenants.usecase';
+import { GetTenantNotificationsUseCase } from '../../usecases/get-tenant-notifications.usecase';
+import { UpdateTenantNotificationsUseCase } from '../../usecases/update-tenant-notifications.usecase';
 import { UpdateTenantSettingsUseCase } from '../../usecases/update-tenant-settings.usecase';
 import { CreateTenantResponse } from '../http/Responses/create-tenant.response';
 import CreateTenantDto from './Dtos/create-tenant.dto';
+import { UpdateTenantNotificationsDto } from './Dtos/update-tenant-notifications.dto';
 import { UpdateTenantSettingsDto } from './Dtos/update-tenant-settings.dto';
 import { GetTenant } from './Responses/get-my-tenants.response';
+import { WhatsappNotificationMapResponse } from './Responses/get-tenant-notifications.response';
 
 @Controller('tenant')
 export class TenantController {
@@ -26,6 +36,8 @@ export class TenantController {
     private createTenantUseCase: CreateTenantUseCase,
     private getMyTenantsUseCase: GetMyTenantsUseCase,
     private updateTenantSettingsUseCase: UpdateTenantSettingsUseCase,
+    private getTenantNotificationsUseCase: GetTenantNotificationsUseCase,
+    private updateTenantNotificationsUseCase: UpdateTenantNotificationsUseCase,
   ) {}
 
   @Post()
@@ -98,6 +110,50 @@ export class TenantController {
   @SkipTenantCheck()
   async getMyTenants(@GetUser() user: JwtPayload) {
     const result = await this.getMyTenantsUseCase.execute({ user });
+
+    if (result.isRight()) {
+      return result.value;
+    }
+  }
+
+  @Get('config/notifications')
+  @ApiOperation({ summary: 'Get tenant notifications' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of tenant notifications',
+    type: WhatsappNotificationMapResponse,
+  })
+  @ApiHeader({ name: 'x-tenant-id', required: true })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getNotifications(@GetTenantId() tenantId: string) {
+    const result = await this.getTenantNotificationsUseCase.execute({
+      tenantId,
+    });
+
+    if (result.isRight()) {
+      return result.value;
+    }
+  }
+
+  @Patch('config/notifications')
+  @ApiOperation({ summary: 'Update tenant notifications' })
+  @ApiResponse({
+    status: 200,
+    description: 'Update tenant notifications',
+    type: WhatsappNotificationMapResponse,
+  })
+  @ApiHeader({ name: 'x-tenant-id', required: true })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async updateNotifications(
+    @GetTenantId() tenantId: string,
+    @Body() data: UpdateTenantNotificationsDto,
+  ) {
+    const result = await this.updateTenantNotificationsUseCase.execute({
+      tenantId,
+      data,
+    });
 
     if (result.isRight()) {
       return result.value;

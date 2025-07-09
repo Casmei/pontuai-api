@@ -1,5 +1,6 @@
+import { getQueueToken } from '@nestjs/bull';
 import { Provider } from '@nestjs/common';
-import { CreatedCustomerEvent } from './created-cutomer.event';
+import { Queue } from 'bull';
 import {
   EVENT_DISPATCHER,
   EventDispatcher,
@@ -12,6 +13,7 @@ import {
   ITenantRepository,
   TENANT_REPOSITORY,
 } from 'src/modules/tenant/interfaces/tenant.repository';
+import { CreatedCustomerEvent } from './created-cutomer.event';
 
 export const events: Provider[] = [
   {
@@ -20,12 +22,19 @@ export const events: Provider[] = [
       eventDispatcher: EventDispatcher,
       whatsAppService: IWhatsAppService,
       tenantRepository: ITenantRepository,
+      customerQueue: Queue,
     ) =>
       new CreatedCustomerEvent(
         eventDispatcher,
         whatsAppService,
         tenantRepository,
+        customerQueue,
       ),
-    inject: [EVENT_DISPATCHER, WHATSAPP_SERVICE, TENANT_REPOSITORY],
+    inject: [
+      EVENT_DISPATCHER,
+      WHATSAPP_SERVICE,
+      TENANT_REPOSITORY,
+      getQueueToken('customer'),
+    ],
   },
 ];

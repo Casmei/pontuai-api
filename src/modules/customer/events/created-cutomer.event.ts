@@ -1,11 +1,7 @@
 import { Logger } from '@nestjs/common';
-import { renderTemplate } from 'src/_utils/whatsapp-template';
+import { Queue } from 'bull';
 import { EventDispatcher } from 'src/modules/@shared/interfaces/event-dispatcher';
 import { IWhatsAppService } from 'src/modules/@shared/interfaces/whatsapp-service';
-import {
-  WhatsappNotificationTemplate,
-  WhatsappNotificationType,
-} from 'src/modules/tenant/entities/tenant-config.entity';
 import { ITenantRepository } from 'src/modules/tenant/interfaces/tenant.repository';
 import { Customer } from '../entities/customer.entity';
 
@@ -16,6 +12,7 @@ export class CreatedCustomerEvent {
     private eventDispatcher: EventDispatcher,
     private whatsappService: IWhatsAppService,
     private tenantRepository: ITenantRepository,
+    private customerQueue: Queue,
   ) {
     this.eventDispatcher.on('customer.created', (data) => {
       this.handleCustomerCreatedEvent(data).catch((err) => {
@@ -33,41 +30,47 @@ export class CreatedCustomerEvent {
   }) {
     const { customer, tenantId } = data;
     this.logger.debug(`Iniciando notificação para o cliente '${customer.id}'`);
+    const job = await this.customerQueue.add('sendNewCustomerNotification', {
+      customer,
+      tenantId,
+    });
 
-    try {
-      const tenantConfig =
-        await this.tenantRepository.getTenantConfig(tenantId);
+    this.logger.debug(`Iniciando notificação para o cliente '${customer.id}'`);
 
-      const template: WhatsappNotificationTemplate | undefined =
-        tenantConfig?.whatsapp_notification?.[
-          WhatsappNotificationType.CUSTOMER_NEW
-        ];
+    // try {
+    //   const tenantConfig =
+    //     await this.tenantRepository.getTenantConfig(tenantId);
 
-      if (!tenantConfig?.whatsapp_config || !template) {
-        this.logger.warn(
-          `Configuração de WhatsApp '${WhatsappNotificationType.CUSTOMER_NEW}' não encontrada para tenant ${tenantId}`,
-        );
-        return;
-      }
+    //   const template: WhatsappNotificationTemplate | undefined =
+    //     tenantConfig?.whatsapp_notification?.[
+    //       WhatsappNotificationType.CUSTOMER_NEW
+    //     ];
 
-      this.whatsappService.configureForTenant(tenantConfig.whatsapp_config);
+    //   if (!tenantConfig?.whatsapp_config || !template) {
+    //     this.logger.warn(
+    //       `Configuração de WhatsApp '${WhatsappNotificationType.CUSTOMER_NEW}' não encontrada para tenant ${tenantId}`,
+    //     );
+    //     return;
+    //   }
 
-      const variableValues: Record<string, string> = {
-        customer_name: customer.name,
-      };
+    //   this.whatsappService.configureForTenant(tenantConfig.whatsapp_config);
 
-      const renderedMessage = renderTemplate(
-        template.defaultMessage,
-        variableValues,
-      );
+    //   const variableValues: Record<string, string> = {
+    //     customer_name: customer.name,
+    //   };
 
-      await this.whatsappService.sendMessage(renderedMessage, customer.phone);
+    //   const renderedMessage = renderTemplate(
+    //     template.defaultMessage,
+    //     variableValues,
+    //   );
 
-      this.logger.log(
-        `Mensagem enviada para ${customer.phone} com template ${WhatsappNotificationType.CUSTOMER_NEW}`,
-      );
-    } catch (error) {
-      this.logger.error('Erro ao notificar usuário:', error.stack || error);
-    }
+    //   await this.whatsappService.sendMessage(renderedMessage, customer.phone);
+
+    //   this.logger.log(
+    //     `Mensagem enviada para ${customer.phone} com template ${WhatsappNotificationType.CUSTOMER_NEW}`,
+    //   );
+    // } catch (error) {
+    //   this.logger.error('Erro ao notificar usuário:', error.stack || error);
+    // }
   }
 }

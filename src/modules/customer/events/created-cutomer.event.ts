@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { Queue } from 'bull';
+import { Queue } from 'bullmq';
 import { EventDispatcher } from 'src/modules/@shared/interfaces/event-dispatcher';
 import { IWhatsAppService } from 'src/modules/@shared/interfaces/whatsapp-service';
 import { ITenantRepository } from 'src/modules/tenant/interfaces/tenant.repository';
@@ -29,13 +29,15 @@ export class CreatedCustomerEvent {
     tenantId: string;
   }) {
     const { customer, tenantId } = data;
-    this.logger.debug(`Iniciando notificação para o cliente '${customer.id}'`);
+    this.logger.debug(
+      `Enviando job 'sendNewCustomerNotification' para o cliente '${customer.id}'`,
+    );
     const job = await this.customerQueue.add('sendNewCustomerNotification', {
       customer,
       tenantId,
     });
 
-    this.logger.debug(`Iniciando notificação para o cliente '${customer.id}'`);
+    // this.logger.debug(`Iniciando notificação para o cliente '${customer.id}'`);
 
     // try {
     //   const tenantConfig =

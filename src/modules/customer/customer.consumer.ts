@@ -1,16 +1,13 @@
-import { Process, Processor } from '@nestjs/bull';
+import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
-import { Job } from 'bull';
-import { Customer } from './entities/customer.entity';
+import { Job } from 'bullmq';
 
-@Processor('customer')
-export class CustomerConsumer {
+@Processor('sendNewCustomerNotification')
+export class CustomerConsumer extends WorkerHost {
   private readonly logger = new Logger(CustomerConsumer.name);
 
-  @Process('sendNewCustomerNotification')
-  async sendNewCustomerNotification(
-    job: Job<{ customer: Customer; tenantId: string }>,
-  ): Promise<any> {
-    this.logger.log(`Processando job: ${job.name}`);
+  process(job: Job, token?: string): Promise<any> {
+    this.logger.debug('Fui chamado');
+    throw new Error('Method not implemented.');
   }
 }

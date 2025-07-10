@@ -1,4 +1,4 @@
-import { BullModule } from '@nestjs/bull';
+import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -17,7 +17,7 @@ import { TransactionModule } from './modules/transaction/transaction.module';
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
     BullModule.forRoot({
-      redis: {
+      connection: {
         host: 'localhost',
         port: 6379,
       },

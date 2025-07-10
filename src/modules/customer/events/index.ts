@@ -1,6 +1,6 @@
-import { getQueueToken } from '@nestjs/bull';
+import { getQueueToken } from '@nestjs/bullmq';
 import { Provider } from '@nestjs/common';
-import { Queue } from 'bull';
+import { Queue } from 'bullmq';
 import {
   EVENT_DISPATCHER,
   EventDispatcher,

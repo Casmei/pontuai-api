@@ -23,12 +23,12 @@ import { GetMyTenantsUseCase } from '../../usecases/get-my-tenants.usecase';
 import { GetTenantNotificationsUseCase } from '../../usecases/get-tenant-notifications.usecase';
 import { UpdateTenantNotificationsUseCase } from '../../usecases/update-tenant-notifications.usecase';
 import { UpdateTenantSettingsUseCase } from '../../usecases/update-tenant-settings.usecase';
-import { CreateTenantResponse } from '../http/Responses/create-tenant.response';
 import CreateTenantDto from './Dtos/create-tenant.dto';
 import { UpdateTenantNotificationsDto } from './Dtos/update-tenant-notifications.dto';
 import { UpdateTenantSettingsDto } from './Dtos/update-tenant-settings.dto';
 import { GetTenant } from './Responses/get-my-tenants.response';
 import { WhatsappNotificationMapResponse } from './Responses/get-tenant-notifications.response';
+import { DocumentCreateTenant } from './tenant-docs.decorator';
 
 @Controller('tenant')
 export class TenantController {
@@ -41,14 +41,7 @@ export class TenantController {
   ) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new tenant' })
-  @ApiResponse({
-    status: 201,
-    description: 'The tenant has been successfully created',
-    type: CreateTenantResponse,
-  })
-  @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @DocumentCreateTenant()
   @SkipTenantCheck()
   async create(@GetUser() user: JwtPayload, @Body() data: CreateTenantDto) {
     const result = await this.createTenantUseCase.execute({ data, user });

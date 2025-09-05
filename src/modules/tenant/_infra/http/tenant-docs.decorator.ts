@@ -7,6 +7,11 @@ import {
 } from '@nestjs/swagger';
 import { ApiDefaultPagination } from 'src/modules/@shared/decorators/api-default-pagination';
 import { CreateTenantResponse } from './Responses/create-tenant.response';
+import { PaginatedCustomerResponse } from 'src/modules/customer/_infra/http/responses/paginated-customer-response';
+import { GetCustomerDetailResponse } from 'src/modules/customer/_infra/http/responses/get-customer-detail.response';
+import { CustomerTransactionsResponse } from 'src/modules/customer/_infra/http/responses/customer-transactions-response';
+import { GetCustomerBalanceStatsResponse } from 'src/modules/customer/_infra/http/responses/get-customer-balance-stats.response';
+import { CustomerStatsResponse } from 'src/modules/customer/_infra/http/responses/customer-stats.response';
 
 export function DocumentCreateTenant() {
   return applyDecorators(

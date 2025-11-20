@@ -1,8 +1,8 @@
 import { Global, Module } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { EvolutionService } from './services/evolution.service'; // ajuste o path se necessário
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { EVENT_DISPATCHER } from './interfaces/event-dispatcher';
 import { WHATSAPP_SERVICE } from './interfaces/whatsapp-service';
+import { UazapiService } from "./services/uazapi.service";
 
 const otherProviders = [
   {
@@ -11,7 +11,7 @@ const otherProviders = [
   },
   {
     provide: WHATSAPP_SERVICE,
-    useClass: EvolutionService,
+    useClass: UazapiService,
   },
 ];
 
